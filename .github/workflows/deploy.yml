@@ -1,0 +1,21 @@
+name: deploy
+on: [push]
+jobs:
+  build:
+    name: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: executing deploy script
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd ~/htdocs/plagiax/
+            git reset --hard HEAD
+            git pull
+            npm install
+            npm run build
+            pm2 start ecosystem.config.js --env production
