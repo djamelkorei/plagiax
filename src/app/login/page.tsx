@@ -1,11 +1,12 @@
 "use client"
 
-import {Box, Button, Field, Fieldset, Flex, Input, Link, Stack} from "@chakra-ui/react";
+import {Box, Button, Field, Fieldset, Flex, HStack, Input, Link as ChakraLink, Stack} from "@chakra-ui/react";
 import {PasswordInput} from "@/components/ui/password-input";
 import {MdArrowRightAlt} from "react-icons/md";
 import {Logo} from "@/components/logo";
 import {AppContext} from "@/data/context";
 import Head from "next/head";
+import Link from "next/link";
 
 
 export default function Login() {
@@ -31,8 +32,8 @@ export default function Login() {
                   Enter your email and password to access your account.
                 </Fieldset.HelperText>
                 <Fieldset.HelperText>
-                  If you don't have an account, you can Please contact us <Link variant="underline"
-                                                                                textDecoration={'underline'}>here</Link>.
+                  If you don't have an account, you can Please contact us <ChakraLink variant="underline"
+                                                                                textDecoration={'underline'}>here</ChakraLink>.
                 </Fieldset.HelperText>
               </Stack>
 
@@ -52,10 +53,17 @@ export default function Login() {
 
               </Fieldset.Content>
 
-              <Button type="submit" alignSelf="flex-start">
-                Sign in
-                <MdArrowRightAlt/>
-              </Button>
+              <HStack justifyContent={'space-between'}>
+                <Button type="submit" alignSelf="flex-start">
+                  Sign in
+                  <MdArrowRightAlt/>
+                </Button>
+                <ChakraLink variant={'underline'} asChild>
+                  <Link href={'/forget-password'}>
+                    Forgot your password?
+                  </Link>
+                </ChakraLink>
+              </HStack>
             </Fieldset.Root>
           </Box>
           <Box display={{base: 'none', md: 'block'}}>
