@@ -16,7 +16,7 @@ export const Header = () => {
   return (
     <Flex
           height={20}
-          paddingX={{base: 6, md: 0}}
+          paddingX={{base: 0, md: 0}}
           gap={6}
           alignItems={'center'}
           justifyContent={'space-between'}

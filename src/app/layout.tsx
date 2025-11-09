@@ -43,7 +43,7 @@ export default function RootLayout({children,}: Readonly<{ children: ReactNode }
 
           {/*Footer*/}
           <Flex paddingY={6}
-                paddingX={{base: 6, md: 0}} gap={6}
+                paddingX={{base: 0, md: 0}} gap={6}
                 alignItems={'center'}
                 justifyContent={'space-between'}
                 borderTop={'1px solid'}
