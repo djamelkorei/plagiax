@@ -3,11 +3,12 @@
 import Link from "next/link";
 
 import {Logo} from "@/components/logo";
-import {Avatar, Box, Button, Container, Flex, Show, Text} from "@chakra-ui/react";
-import {MdLogin} from "react-icons/md";
+import {Avatar, Box, Button, Container, Flex, HStack, Show, Text} from "@chakra-ui/react";
+import {MdArrowRightAlt, MdLogin} from "react-icons/md";
 import {usePathname, useRouter} from "next/navigation";
 import {Activity} from "react";
 import {useAuth} from "@/hooks/use-auth";
+import {IoLogOutOutline} from "react-icons/io5";
 
 
 export const Header = () => {
@@ -55,17 +56,42 @@ export const Header = () => {
                 </Link>
               </Button>
             </Show>
+
+            <Show when={isLoginPage}>
+              <Button asChild>
+                <Link href={'/login'}>
+                  Contact us
+                  <MdArrowRightAlt/>
+                </Link>
+              </Button>
+            </Show>
+
           </Activity>
 
           <Activity mode={isAuthenticated ? 'visible' : 'hidden'}>
-            <Flex cursor={'pointer'} _hover={{bg: 'gray.50'}} p={1} borderRadius={4} alignItems={'center'} gap={1} onClick={() => {
-              router.push('/dashboard/account');
-            }}>
-              <Avatar.Root size={'2xs'}>
-                <Avatar.Fallback name={auth.name}/>
-              </Avatar.Root>
-              <Text textStyle={'sm'}>{auth.name}</Text>
-            </Flex>
+            <HStack>
+              <Button variant={'ghost'}
+                      cursor={'pointer'}
+                      p={1} borderRadius={4}
+                      alignItems={'center'} gap={1} onClick={() => {
+                router.push('/dashboard/account');
+              }}>
+                <Avatar.Root size={'2xs'}>
+                  <Avatar.Fallback name={auth.name}/>
+                </Avatar.Root>
+                <Text textStyle={'sm'}>{auth.name}</Text>
+              </Button>
+
+              |
+
+              <Button asChild size={'md'} colorPalette={'orange'} variant={'ghost'}>
+                <Link href={'/login'}>
+
+                  <IoLogOutOutline/>
+                  logout
+                </Link>
+              </Button>
+            </HStack>
 
           </Activity>
 

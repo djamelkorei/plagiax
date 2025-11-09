@@ -59,7 +59,7 @@ export default function RootLayout({children,}: Readonly<{ children: ReactNode }
                 <Logo/>
               </Link>
 
-              <Flex gap={4}>
+              <Flex gap={4} textStyle={'sm'}>
                 <ChakraLink variant={'underline'} asChild>
                   <Link href={'/terms'}>Terms of Use</Link>
                 </ChakraLink>
@@ -68,7 +68,7 @@ export default function RootLayout({children,}: Readonly<{ children: ReactNode }
                 </ChakraLink>
               </Flex>
 
-              <Text>
+              <Text textStyle={'sm'}>
                 © {new Date().getFullYear()} {AppContext.name}. All rights reserved
               </Text>
 
