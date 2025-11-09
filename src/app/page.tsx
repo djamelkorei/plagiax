@@ -228,8 +228,9 @@ export default function Home() {
           <Button w={'fit-content'} asChild>
             <Link href={'/login'}>
               Get Started
+              <MdArrowRightAlt/>
             </Link>
-            <MdArrowRightAlt/>
+
           </Button>
         </Flex>
 

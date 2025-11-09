@@ -31,7 +31,7 @@ const config = defineConfig({
     },
     "body": {
       position: 'relative',
-      fontFamily: "Roboto, sans-serif",
+      fontFamily: "Geist, Geist Fallback"
     },
     "a": {
       outline: "none !important"
@@ -39,6 +39,9 @@ const config = defineConfig({
     ".cm-editor": {
       fontFamily: "'Fira Code', monospace !important",
     },
+    ".font-logo": {
+      fontFamily: "Geist Mono, Geist Mono Fallback"
+    }
   },
   theme: {
     // recipes: {

@@ -1,5 +1,3 @@
-
-
 export const AppContext = {
-  name: 'Plagiax',
+  name: 'PlagiaX',
 }
