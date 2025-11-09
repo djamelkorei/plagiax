@@ -2,10 +2,12 @@ import type {Metadata} from "next";
 import {Provider} from "@/components/ui/provider"
 import {Geist, Geist_Mono} from "next/font/google";
 
-import {Button, Container, Flex, Text} from "@chakra-ui/react"
+import {Container, Flex, Link as ChakraLink, Text} from "@chakra-ui/react"
 import {Logo} from "@/components/logo";
 import {AppContext} from "@/data/context";
-import {MdLogin} from "react-icons/md";
+import Link from "next/link";
+import {ReactNode} from "react";
+import {Header} from "@/components/header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,11 +24,9 @@ export const metadata: Metadata = {
   description: "Plagiarism Detection Made Easy",
 };
 
-export default function RootLayout({
-                                     children,
-                                   }: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({children,}: Readonly<{ children: ReactNode }>) {
+
+
   return (
     <html lang="en" suppressHydrationWarning>
     <body className={`${geistSans.variable} ${geistMono.variable}`}>
@@ -36,39 +36,31 @@ export default function RootLayout({
 
         <Container px={{base: 8, lg: 40}}>
           {/*Navbar*/}
-          <Flex padding={6} gap={6}
-                alignItems={'center'}
-                justifyContent={'space-between'}
-                borderBottom={'1px solid'}
-                borderColor={'border'}>
-            <Logo/>
-
-            <Button>
-              Login
-              <MdLogin/>
-            </Button>
-          </Flex>
+          <Header/>
 
           {children}
 
 
           {/*Footer*/}
-          <Flex padding={6} gap={6}
+          <Flex paddingY={6}
+                paddingX={{base: 6, md: 0}} gap={6}
                 alignItems={'center'}
                 justifyContent={'space-between'}
                 borderTop={'1px solid'}
                 borderColor={'border'}
                 flexWrap={'wrap'}
           >
-            <Logo/>
+            <Link href={'/'}>
+              <Logo/>
+            </Link>
 
-            <Flex>
-              <Button variant={'ghost'}>
-                Terms of Use
-              </Button>
-              <Button variant={'ghost'}>
-                Privacy
-              </Button>
+            <Flex gap={4}>
+              <ChakraLink variant={'underline'} asChild>
+                <Link href={'/terms'}>Terms of Use</Link>
+              </ChakraLink>
+              <ChakraLink variant={'underline'}>
+                <Link href={'/privacy'}>Privacy</Link>
+              </ChakraLink>
             </Flex>
 
             <Text>

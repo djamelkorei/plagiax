@@ -12,6 +12,7 @@ import {
   IoInformationCircleOutline,
   IoSearchCircleOutline
 } from "react-icons/io5";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -30,9 +31,11 @@ export default function Home() {
             ensure
             their content is unique and error-free.
           </Text>
-          <Button w={'fit-content'} px={10}>
-            Start Now
-            <MdArrowRightAlt/>
+          <Button w={'fit-content'} px={10} asChild>
+            <Link href={'/login'}>
+              Start Now
+              <MdArrowRightAlt/>
+            </Link>
           </Button>
         </Flex>
         <Flex flex={1} justifyContent={'center'}>
@@ -186,7 +189,7 @@ export default function Home() {
           ensure your work is completely unique.
         </Text>
         <SimpleGrid columns={[1, 1, 3]}
-              gap={6}
+                    gap={6}
         >
           <StepCard
             icon={IoCloudUploadOutline}
@@ -222,11 +225,10 @@ export default function Home() {
           <Text fontSize="md" mb={6}>
             Start using {AppContext.name} today and ensure your content is always original.
           </Text>
-          <Button
-            w={'fit-content'}
-            onClick={() => alert('Get Started')}
-          >
-            Get Started
+          <Button w={'fit-content'} asChild>
+            <Link href={'/login'}>
+              Get Started
+            </Link>
             <MdArrowRightAlt/>
           </Button>
         </Flex>
@@ -388,7 +390,7 @@ interface StepCardProps {
 const StepCard = ({icon, step, title, description}: StepCardProps) => {
 
   return (
-    <Box textAlign="center"  border={'1px solid'} borderColor={'border'} p={6}>
+    <Box textAlign="center" border={'1px solid'} borderColor={'border'} p={6}>
       <Icon as={icon} w={14} h={14} mb={6} color={'orange.800'}/>
       <Text fontSize="xl" fontWeight="bold" mb={2}>
         Step {step}
