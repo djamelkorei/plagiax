@@ -41,7 +41,7 @@ export const Header = () => {
             <Flex gap={6} alignItems={'center'}>
               <NavLink text={'Dashboard'} href={'/dashboard'}/>
               <NavLink text={'Submissions'} href={'/dashboard/submissions'}/>
-
+              <NavLink text={'Students'} href={'/dashboard/students'}/>
             </Flex>
           </Activity>
 
