@@ -1,0 +1,23 @@
+# robots.txt for PlagiaX
+
+# Allow all bots to access everything
+User-agent: *
+Disallow:
+
+# Block specific bots (example: Googlebot)
+User-agent: Googlebot
+Disallow: /private/
+
+# Allow Googlebot to access everything except /dashboard/
+User-agent: Googlebot
+Disallow: /dashboard/
+
+# Disallow all bots from crawling the /images/ folder
+User-agent: *
+Disallow: /images/
+
+# Crawl delay (in seconds) for all bots
+Crawl-delay: 10
+
+# Sitemap URL (optional, but good for SEO)
+Sitemap: https://www.plagiax.com/sitemap.xml

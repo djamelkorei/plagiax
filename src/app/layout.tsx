@@ -20,8 +20,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Plagiax",
+  title: AppContext.name,
   description: "Plagiarism Detection Made Easy",
+  keywords: "plagiarism detection, plagiarism checker, originality, content checker",
+  openGraph: {
+    title: `${AppContext.name} | Plagiarism Detection Made Easy`,
+    description: `${AppContext.name} helps you easily detect plagiarism and ensure your content is original and error-free.`,
+    url: AppContext.url,
+    images: `${AppContext.url}/og-image.jpg`
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${AppContext.name} | Plagiarism Detection Made Easy`,
+    description: `${AppContext.name} helps you easily detect plagiarism and ensure your content is original and error-free.`,
+    images: `${AppContext.url}/og-image.jpg`
+  },
 };
 
 export default function RootLayout({children,}: Readonly<{ children: ReactNode }>) {
