@@ -18,6 +18,7 @@ export default function DashboardHome() {
   return (
     <DashboardContainer
       title={'Dashboard'}
+      breadcrumbs={['dashboard']}
     >
       <Flex gap={6} flexDirection={'column'}>
 
@@ -220,20 +221,20 @@ const SubmissionChart = () => {
           </defs>
         ))}
 
-        {chart.series.map((item) => (
-          <Area
-            isAnimationActive={false}
-            stackId="b"
-            legendType="none"
-            tooltipType="none"
-            key={item.name}
-            dataKey={chart.key(item.name)}
-            dot={{ fill: chart.color(item.color), fillOpacity: 1 }}
-            activeDot={false}
-            fill="none"
-            stroke="none"
-          />
-        ))}
+        {/*{chart.series.map((item) => (*/}
+        {/*  <Area*/}
+        {/*    isAnimationActive={false}*/}
+        {/*    stackId="b"*/}
+        {/*    legendType="none"*/}
+        {/*    tooltipType="none"*/}
+        {/*    key={item.name}*/}
+        {/*    dataKey={chart.key(item.name)}*/}
+        {/*    dot={{fill: chart.color(item.color), fillOpacity: 1}}*/}
+        {/*    activeDot={false}*/}
+        {/*    fill="none"*/}
+        {/*    stroke="none"*/}
+        {/*  />*/}
+        {/*))}*/}
 
         {chart.series.map((item) => (
           <Area

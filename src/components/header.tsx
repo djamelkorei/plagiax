@@ -3,9 +3,9 @@
 import Link from "next/link";
 
 import {Logo} from "@/components/logo";
-import {Avatar, Box, Button, Container, Flex, Show} from "@chakra-ui/react";
+import {Avatar, Box, Button, Container, Flex, Show, Text} from "@chakra-ui/react";
 import {MdLogin} from "react-icons/md";
-import {usePathname} from "next/navigation";
+import {usePathname, useRouter} from "next/navigation";
 import {Activity} from "react";
 import {useAuth} from "@/hooks/use-auth";
 
@@ -16,6 +16,7 @@ export const Header = () => {
   const isLoginPage = pathname === '/login';
   const isAuthenticated = pathname.startsWith('/dashboard');
   const {auth} = useAuth();
+  const router = useRouter();
 
   return (
     <Box
@@ -36,6 +37,15 @@ export const Header = () => {
           </Link>
 
 
+          <Activity mode={isAuthenticated ? 'visible' : 'hidden'}>
+            <Flex gap={6} alignItems={'center'}>
+              <NavLink text={'Dashboard'} href={'/dashboard'}/>
+              <NavLink text={'Submissions'} href={'/dashboard/submissions'}/>
+
+            </Flex>
+          </Activity>
+
+
           <Activity mode={isAuthenticated ? 'hidden' : 'visible'}>
             <Show when={!isLoginPage}>
               <Button asChild>
@@ -48,11 +58,13 @@ export const Header = () => {
           </Activity>
 
           <Activity mode={isAuthenticated ? 'visible' : 'hidden'}>
-            <Flex alignItems={'center'} gap={2}>
+            <Flex cursor={'pointer'} _hover={{bg: 'gray.50'}} p={1} borderRadius={4} alignItems={'center'} gap={1} onClick={() => {
+              router.push('/dashboard/account');
+            }}>
               <Avatar.Root size={'2xs'}>
                 <Avatar.Fallback name={auth.name}/>
               </Avatar.Root>
-              {auth.name}
+              <Text textStyle={'sm'}>{auth.name}</Text>
             </Flex>
 
           </Activity>
@@ -62,5 +74,16 @@ export const Header = () => {
       </Container>
     </Box>
 
+  )
+}
+
+
+const NavLink = ({text, href}: { text: string, href: string }) => {
+  return (
+    <Text transition={'all 0.2s ease'} color={'gray.500'} _hover={{color: 'black'}} fontSize={'0.875rem'}>
+      <Link href={href}>
+        {text}
+      </Link>
+    </Text>
   )
 }
