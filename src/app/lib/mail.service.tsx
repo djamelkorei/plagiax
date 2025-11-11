@@ -3,18 +3,23 @@ import WelcomeEmailTemplate from "@/emails/welcome.email.template";
 import {AppContext} from "@/data/context";
 import ResetPasswordEmailTempla from "@/emails/reset-password.email.template";
 import {JSX} from "react";
+import {Resend} from 'resend';
+
+const resend = new Resend(process.env.RESEND_KEY);
 
 const sendEmail = async (to: string, subject: string, template: JSX.Element) => {
 
   const html = await render(template);
   const text = toPlainText(html);
 
-  console.log(`[${new Date().toISOString()}] Sending email:
-  To: ${to}
-  Subject: ${subject}
-  HTML Content: ${html}
-  Plain Text Content: ${text}`);
-  // TODO: update
+  await resend.emails.send({
+    from: AppContext.emailNoReply,
+    to: to,
+    subject: subject,
+    html: html,
+    text: text
+  });
+
 }
 
 const sendWelcomeEmail = async (userName: string, userEmail: string) => {
