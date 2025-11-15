@@ -15,7 +15,7 @@ import {useState} from "react";
 import {useRouter} from "next/navigation";
 import {useAuth} from "@/hooks/use-auth";
 import {loginAction} from "@/app/actions/login.action";
-import {FormHelper} from "@/helpers/form.herlper";
+import {FormHelper} from "@/helpers/form.helper";
 
 export default function Login() {
 

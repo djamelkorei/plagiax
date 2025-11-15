@@ -1,18 +1,23 @@
 'use client';
 
-import {Card, Flex, Icon, SimpleGrid, Stat, Text} from "@chakra-ui/react";
+import {Card, Flex, Icon, SimpleGrid, Skeleton, Stat, Text} from "@chakra-ui/react";
 import {DashboardContainer} from "@/components/dashboard-container";
 import {HiOutlineUsers} from "react-icons/hi";
 import {LuBadgeCheck} from "react-icons/lu";
 import {PiNewspaper} from "react-icons/pi";
 import {Chart, useChart} from "@chakra-ui/charts";
 import {Area, AreaChart, CartesianGrid, Cell, Label, Legend, Pie, PieChart, Tooltip, XAxis, YAxis,} from "recharts";
+import {useAuth} from "@/hooks/use-auth";
+import {formatDatePretty} from "@/helpers/date.helper";
 
 export default function DashboardHome() {
 
-  const startDate = '09 Nov 2025';
-  const endDate = '09 Dec 2025';
-  const membershipLength = 1;
+  const auth = useAuth((s) => s.auth)
+  const isAuthLoading = useAuth((s) => s.isAuthLoading)
+
+  const startDate = formatDatePretty(auth.membership_started_at);
+  const endDate = formatDatePretty(auth.membership_ended_at);
+  const membershipLength = auth.membership_length;
   const membershipUnit = 'Month(s)'
 
   return (
@@ -33,12 +38,18 @@ export default function DashboardHome() {
                     <LuBadgeCheck/>
                   </Icon>
                 </Stat.Label>
-                <Stat.ValueText
-                  color={'green.600'}
-                >
-                  Active
-                </Stat.ValueText>
-                <Stat.HelpText>Total days left <b>32 days</b></Stat.HelpText>
+                <Skeleton loading={isAuthLoading} w={'fit-content'}>
+                  <Stat.ValueText
+                    color={auth.is_membership_active ? 'teal.600' : 'orange.600'}
+                  >
+                    {auth.is_membership_active ? 'Active' : 'Inactive'}
+                  </Stat.ValueText>
+                </Skeleton>
+                <Skeleton loading={isAuthLoading} w={'fit-content'} h={'fit-content'}>
+                  <Stat.HelpText>
+                    Total days left <b>{auth.membership_days_left} days</b>
+                  </Stat.HelpText>
+                </Skeleton>
               </Stat.Root>
             </Card.Body>
           </Card.Root>
@@ -52,12 +63,18 @@ export default function DashboardHome() {
                     <HiOutlineUsers/>
                   </Icon>
                 </Stat.Label>
-                <Stat.ValueText
-                  alignItems="baseline"
-                >
-                  12 <Stat.ValueUnit>/ {(2000).toLocaleString()}</Stat.ValueUnit>
-                </Stat.ValueText>
-                <Stat.HelpText>Total account left <b>{(2000 - 12).toLocaleString()}</b></Stat.HelpText>
+                <Skeleton loading={isAuthLoading} w={'fit-content'}>
+                  <Stat.ValueText
+                    alignItems="baseline"
+                  >
+                    12 <Stat.ValueUnit>/ {(2000).toLocaleString()}</Stat.ValueUnit>
+                  </Stat.ValueText>
+                </Skeleton>
+                <Skeleton loading={isAuthLoading} w={'fit-content'}>
+                  <Stat.HelpText>
+                    Total account left <b>{(2000 - 12).toLocaleString()}</b>
+                  </Stat.HelpText>
+                </Skeleton>
               </Stat.Root>
             </Card.Body>
           </Card.Root>
@@ -71,11 +88,14 @@ export default function DashboardHome() {
                     <PiNewspaper/>
                   </Icon>
                 </Stat.Label>
-                <Stat.ValueText
-                >
-                  {(708).toLocaleString()}
-                </Stat.ValueText>
-                <Stat.HelpText>Total documents submitted</Stat.HelpText>
+                <Skeleton loading={isAuthLoading} w={'fit-content'}>
+                  <Stat.ValueText>
+                    {auth.submission_count.toLocaleString()}
+                  </Stat.ValueText>
+                </Skeleton>
+                <Skeleton loading={isAuthLoading} w={'fit-content'} h={'fit-content'}>
+                  <Stat.HelpText>The total documents submitted</Stat.HelpText>
+                </Skeleton>
               </Stat.Root>
             </Card.Body>
           </Card.Root>
@@ -88,23 +108,31 @@ export default function DashboardHome() {
               <Stat.Label>
                 Membership Length
               </Stat.Label>
-              <Stat.ValueText alignItems="baseline">
-                {membershipLength}
-                <Stat.ValueUnit>
-                  {membershipUnit}
-                </Stat.ValueUnit>
-              </Stat.ValueText>
-              <Stat.HelpText>Start at <b>{startDate}</b> | End at <b>{endDate}</b></Stat.HelpText>
+              <Skeleton loading={isAuthLoading} w={'fit-content'} h={'fit-content'}>
+                <Stat.ValueText alignItems="baseline">
+                  {membershipLength}
+                  <Stat.ValueUnit>
+                    {membershipUnit}
+                  </Stat.ValueUnit>
+                </Stat.ValueText>
+              </Skeleton>
+              <Skeleton loading={isAuthLoading} w={'fit-content'} h={'fit-content'}>
+                <Stat.HelpText>Start at <b>{startDate}</b> | End at <b>{endDate}</b></Stat.HelpText>
+              </Skeleton>
             </Stat.Root>
-            <MembershipChart/>
+            <Skeleton loading={isAuthLoading} w={'fit-content'} h={'fit-content'} borderRadius={'full'}>
+              <MembershipChart/>
+            </Skeleton>
           </Card.Body>
         </Card.Root>
 
-        <Card.Root>
-          <Card.Body>
-            <SubmissionChart/>
-          </Card.Body>
-        </Card.Root>
+        <Skeleton loading={isAuthLoading}>
+          <Card.Root>
+            <Card.Body>
+              <SubmissionChart/>
+            </Card.Body>
+          </Card.Root>
+        </Skeleton>
 
 
       </Flex>
@@ -114,10 +142,13 @@ export default function DashboardHome() {
 }
 
 const MembershipChart = () => {
+  const auth = useAuth((s) => s.auth);
+  const student_account_left = auth.membership_student_count - auth.student_count;
+
   const chart = useChart({
     data: [
-      {name: "account used", value: 18, color: "orange.300"},
-      {name: "account free to use", value: 1982, color: "gray.200"},
+      {name: "account used", value: auth.student_count, color: "teal.200"},
+      {name: "account free to use", value: student_account_left > 0 ? student_account_left : 0, color: "gray.200"},
     ],
   })
 

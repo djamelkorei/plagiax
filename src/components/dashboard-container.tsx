@@ -1,9 +1,10 @@
 'use client'
 
 import React, {Activity, ReactNode} from "react";
-import {Badge, Box, Button, Flex, Text} from "@chakra-ui/react";
+import {Badge, Box, Button, Flex, Skeleton, Text} from "@chakra-ui/react";
 import {HiOutlineHome, HiOutlineMail} from "react-icons/hi";
 import {usePathname} from "next/navigation";
+import {useAuth} from "@/hooks/use-auth";
 
 interface DashboardContainerProps {
   title: string,
@@ -51,6 +52,9 @@ export const DashboardContainer = (props: DashboardContainerProps) => {
 
 export const MembershipBar = () => {
 
+  const auth = useAuth((s) => s.auth)
+  const isAuthLoading = useAuth((s) => s.isAuthLoading)
+
   return (
     <Flex gap={6}
           borderBottom={'1px solid'}
@@ -61,22 +65,39 @@ export const MembershipBar = () => {
     >
       <Flex gap={2} alignItems={'center'}>
         <Text textStyle={'sm'} fontWeight={'semibold'}>Membership</Text>
-        <Badge colorPalette={'teal'}>Active</Badge>
-      </Flex>
-
-      <Text color={'gray.300'} display={{base: 'none', md: 'block'}}>|</Text>
-
-      <Flex gap={2} alignItems={'center'}>
-        <Text textStyle={'sm'} fontWeight={'semibold'}>Student Accounts</Text>
-        <Badge colorPalette={'teal'}>1/{(2000).toLocaleString()}</Badge>
+        <Skeleton loading={isAuthLoading}>
+          <Badge colorPalette={auth.is_membership_active ? 'teal' : 'red'}>
+            {auth.is_membership_active ? 'Active' : 'Inactive'}
+          </Badge>
+        </Skeleton>
       </Flex>
 
       <Text color={'gray.300'} display={{base: 'none', md: 'block'}}>|</Text>
 
       <Flex gap={2} alignItems={'center'}>
         <Text textStyle={'sm'} fontWeight={'semibold'}>Days Left</Text>
-        <Badge colorPalette={'teal'}>34 days</Badge>
+        <Skeleton loading={isAuthLoading}>
+          <Badge colorPalette={auth.is_membership_active ? 'teal' : 'red'}>
+            {auth.membership_days_left} days
+          </Badge>
+        </Skeleton>
       </Flex>
+
+      {auth.is_instructor && (
+        <>
+          <Text color={'gray.300'} display={{base: 'none', md: 'block'}}>|</Text>
+
+          <Flex gap={2} alignItems={'center'}>
+            <Text textStyle={'sm'} fontWeight={'semibold'}>Student Accounts</Text>
+            <Badge
+              colorPalette={auth.is_membership_active
+                ? (auth.student_count === auth.membership_student_count ? 'orange' : 'teal')
+                : 'red'}>
+              {auth.student_count}/{auth.membership_student_count.toLocaleString()}
+            </Badge>
+          </Flex>
+        </>
+      )}
 
       <Flex alignItems={'center'} gap={2} ms={{base: 'inherit', md: 'auto'}}>
 

@@ -1,33 +1,40 @@
 import {create} from 'zustand'
 import Cookies from "js-cookie";
 import {ClientService} from "@/lib/client.service";
+import {AuthDto} from "@/dto/user.dto";
 
 interface AuthState {
-  auth: AuthProps
+  auth: AuthDto
   isAuthenticated: boolean
-  setAuth: (auth: AuthProps) => void
+  setAuth: (auth: AuthDto) => void
   logout: () => void
   loadUser: () => Promise<boolean>,
   isAuthLoading: boolean
 }
 
-interface AuthProps {
-  id: number,
-  name: string,
-  email: string,
+const anonymous: AuthDto = {
+  id: 0,
+  name: '',
+  email: '',
+  student_count: 0,
+  submission_count: 0,
+  membership_threshold: 0,
+  membership_length: 0,
+  membership_student_count: 0,
+  membership_started_at: new Date(),
+  membership_ended_at: new Date(),
+  membership_days_left: 0,
+  is_membership_active: false,
+  is_instructor: false
 }
 
 export const useAuth = create<AuthState>((set) => ({
-  auth: {
-    id: 0,
-    name: '',
-    email: '',
-  },
+  auth: anonymous,
   isAuthenticated: false,
   isAuthLoading: true,
-  setAuth: (auth: AuthProps) => set({auth: auth}),
+  setAuth: (auth: AuthDto) => set({auth: auth}),
   logout: () => {
-    set({auth: {id: 0, name: '', email: ''}});
+    set({auth: anonymous});
     Cookies.remove('auth_token');
   },
   loadUser: async () => {
@@ -41,11 +48,7 @@ export const useAuth = create<AuthState>((set) => ({
         set({
           isAuthenticated: true,
           isAuthLoading: false,
-          auth: {
-            id: response.data.id,
-            name: response.data.name,
-            email: response.data.email,
-          }
+          auth: {...response.data}
         });
         return true
       }
@@ -55,7 +58,7 @@ export const useAuth = create<AuthState>((set) => ({
     set({
       isAuthenticated: false,
       isAuthLoading: false,
-      auth: {id: 0, name: '', email: ''}
+      auth: anonymous
     })
     return false
   },
