@@ -24,14 +24,13 @@ export const useAuth = create<AuthState>((set) => ({
     email: '',
   },
   isAuthenticated: false,
-  isAuthLoading: false,
+  isAuthLoading: true,
   setAuth: (auth: AuthProps) => set({auth: auth}),
   logout: () => {
     set({auth: {id: 0, name: '', email: ''}});
     Cookies.remove('auth_token');
   },
   loadUser: async () => {
-
     set({isAuthLoading: true});
     try {
 

@@ -3,23 +3,34 @@
 import Link from "next/link";
 
 import {Logo} from "@/components/logo";
-import {Avatar, Box, Button, Container, Flex, HStack, Show, Text} from "@chakra-ui/react";
+import {Avatar, Box, Button, Container, Flex, HStack, Show, Skeleton, Text} from "@chakra-ui/react";
 import {MdArrowRightAlt, MdLogin} from "react-icons/md";
 import {usePathname, useRouter} from "next/navigation";
 import {Activity} from "react";
 import {useAuth} from "@/hooks/use-auth";
 import {IoLogOutOutline} from "react-icons/io5";
+import {logoutAction} from "@/app/actions/logout.action";
 
 
 export const Header = () => {
 
   const pathname = usePathname();
   const isLoginPage = pathname === '/login';
+  const isDashboardPage = pathname.startsWith('/dashboard');
   const router = useRouter();
 
+  const loadUser = useAuth((s) => s.loadUser);
   const auth = useAuth((s) => s.auth);
   const isAuthenticated = useAuth((s) => s.isAuthenticated);
-  // const isAuthLoading = useAuth((s) => s.isAuthLoading);
+  const isAuthLoading = useAuth((s) => s.isAuthLoading);
+
+  const logoutHandler = () => {
+    logoutAction().then(() => {
+      loadUser().finally(() => {
+        router.push('/login')
+      })
+    })
+  }
 
   return (
     <Box
@@ -39,33 +50,36 @@ export const Header = () => {
             <Logo/>
           </Link>
 
-          <Activity mode={isAuthenticated ? 'visible' : 'hidden'}>
-            <Flex gap={6} alignItems={'center'}>
-              <NavLink text={'Dashboard'} href={'/dashboard'}/>
-              <NavLink text={'Submissions'} href={'/dashboard/submissions'}/>
-              <NavLink text={'Students'} href={'/dashboard/students'}/>
-            </Flex>
+          <Activity mode={isAuthenticated || (isDashboardPage && isAuthLoading) ? 'visible' : 'hidden'}>
+            <Skeleton loading={isAuthLoading}>
+              <Flex gap={6} alignItems={'center'}>
+                <NavLink text={'Dashboard'} href={'/dashboard'}/>
+                <NavLink text={'Submissions'} href={'/dashboard/submissions'}/>
+                <NavLink text={'Students'} href={'/dashboard/students'}/>
+              </Flex>
+            </Skeleton>
           </Activity>
 
           <Activity mode={isAuthenticated ? 'hidden' : 'visible'}>
-            <Show when={!isLoginPage}>
-              <Button asChild>
-                <Link href={'/login'}>
-                  Login
-                  <MdLogin/>
-                </Link>
-              </Button>
-            </Show>
+            <Skeleton loading={isAuthLoading} ms={{base: 0, lg: '8rem'}}>
+              <Show when={!isLoginPage}>
+                <Button asChild>
+                  <Link href={'/login'}>
+                    Login
+                    <MdLogin/>
+                  </Link>
+                </Button>
+              </Show>
 
-            <Show when={isLoginPage}>
-              <Button asChild>
-                <Link href={'/login'}>
-                  Contact us
-                  <MdArrowRightAlt/>
-                </Link>
-              </Button>
-            </Show>
-
+              <Show when={isLoginPage}>
+                <Button asChild>
+                  <Link href={'/login'}>
+                    Contact us
+                    <MdArrowRightAlt/>
+                  </Link>
+                </Button>
+              </Show>
+            </Skeleton>
           </Activity>
 
           <Activity mode={isAuthenticated ? 'visible' : 'hidden'}>
@@ -84,12 +98,13 @@ export const Header = () => {
 
               |
 
-              <Button asChild size={'md'} colorPalette={'orange'} variant={'ghost'}>
-                <Link href={'/login'}>
-
-                  <IoLogOutOutline/>
-                  logout
-                </Link>
+              <Button size={'md'} colorPalette={'orange'} variant={'ghost'}
+                      onClick={() => {
+                        logoutHandler();
+                      }}
+              >
+                <IoLogOutOutline/>
+                logout
               </Button>
             </HStack>
 

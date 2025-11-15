@@ -17,6 +17,7 @@ export type ApiResponse<T> =
 const api_auth_me = async (): Promise<ApiResponse<AuthDto>> => {
   try {
     const res = await axios.get<AuthDto>("/api/auth/me");
+
     return {
       data: res.data,
       hasError: false,
@@ -38,7 +39,7 @@ const api_auth_me = async (): Promise<ApiResponse<AuthDto>> => {
 export const ClientService = {
   api: {
     auth: {
-      me: api_auth_me
+      me: api_auth_me,
     }
   }
 }

@@ -10,11 +10,12 @@ import Link from "next/link";
 import {LoginFormRequest, LoginFormSchema} from "@/lib/form.service";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useForm} from "react-hook-form";
-import axios from "axios";
 import {toaster} from "@/components/ui/toaster";
 import {useState} from "react";
 import {useRouter} from "next/navigation";
 import {useAuth} from "@/hooks/use-auth";
+import {loginAction} from "@/app/actions/login.action";
+import {FormHelper} from "@/helpers/form.herlper";
 
 export default function Login() {
 
@@ -30,13 +31,13 @@ export default function Login() {
   });
 
   const onSubmit = async (data: LoginFormRequest) => {
-    setLoading(true)
-    axios.post('/api/auth/login', {email: data.email, password: data.password})
+    setLoading(true);
+    loginAction(FormHelper.toFormData({email: data.email, password: data.password}))
       .then(() => {
         setTimeout(async () => {
           await loadUser();
           router.push('/dashboard');
-        }, 1500);
+        }, 500);
       }).catch((error) => {
       setLoading(false)
       const message = error.response?.data?.message || 'Something went wrong'
