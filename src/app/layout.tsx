@@ -8,6 +8,9 @@ import {AppContext} from "@/data/context";
 import Link from "next/link";
 import {ReactNode} from "react";
 import {Header} from "@/components/header";
+import {Toaster} from "@/components/ui/toaster";
+import {AuthContext} from "@/components/auth-context";
+import {TopProgress} from "@/components/top-progress";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,13 +42,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({children,}: Readonly<{ children: ReactNode }>) {
 
-
   return (
     <html lang="en" suppressHydrationWarning>
     <body className={`${geistSans.variable} ${geistMono.variable} `}>
     <Provider>
 
+
+
       <Flex direction="column" h="full" w={'full'} gap={6}>
+
+        <TopProgress/>
 
         {/*Navbar*/}
         <Header/>
@@ -54,6 +60,9 @@ export default function RootLayout({children,}: Readonly<{ children: ReactNode }
           {children}
         </Container>
 
+        <Toaster/>
+
+        <AuthContext/>
 
         {/*Footer*/}
         <Box

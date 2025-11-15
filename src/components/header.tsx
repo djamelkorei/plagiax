@@ -15,9 +15,11 @@ export const Header = () => {
 
   const pathname = usePathname();
   const isLoginPage = pathname === '/login';
-  const isAuthenticated = pathname.startsWith('/dashboard');
-  const {auth} = useAuth();
   const router = useRouter();
+
+  const auth = useAuth((s) => s.auth);
+  const isAuthenticated = useAuth((s) => s.isAuthenticated);
+  // const isAuthLoading = useAuth((s) => s.isAuthLoading);
 
   return (
     <Box
@@ -37,7 +39,6 @@ export const Header = () => {
             <Logo/>
           </Link>
 
-
           <Activity mode={isAuthenticated ? 'visible' : 'hidden'}>
             <Flex gap={6} alignItems={'center'}>
               <NavLink text={'Dashboard'} href={'/dashboard'}/>
@@ -45,7 +46,6 @@ export const Header = () => {
               <NavLink text={'Students'} href={'/dashboard/students'}/>
             </Flex>
           </Activity>
-
 
           <Activity mode={isAuthenticated ? 'hidden' : 'visible'}>
             <Show when={!isLoginPage}>
@@ -94,7 +94,6 @@ export const Header = () => {
             </HStack>
 
           </Activity>
-
 
         </Flex>
       </Container>

@@ -1,4 +1,5 @@
 import {createSystem, defaultConfig, defineConfig} from "@chakra-ui/react";
+import {progressSlotRecipe} from "@/components/ui/recipes/progress.recipe";
 
 
 // const brandColor = "#38dfdb"
@@ -44,20 +45,21 @@ const config = defineConfig({
     }
   },
   theme: {
-    // recipes: {
-    //   button: buttonRecipe,
-    //   input: inputRecipe,
-    //   container: containerRecipe,
-    //   textarea: textareaRecipe,
-    // },
-    // slotRecipes: {
-    //   toast: toastSlotRecipe,
-    //   select: selectSlotRecipe,
-    //   table: tableSlotRecipe,
-    //   menu: menuSlotRecipe,
-    //   radioCard: radioCardSlotRecipe,
-    //   switch: switchSlotRecipe,
-    // },
+    recipes: {
+      // button: buttonRecipe,
+      // input: inputRecipe,
+      // container: containerRecipe,
+      // textarea: textareaRecipe,
+    },
+    slotRecipes: {
+      //   toast: toastSlotRecipe,
+      //   select: selectSlotRecipe,
+      //   table: tableSlotRecipe,
+      //   menu: menuSlotRecipe,
+      //   radioCard: radioCardSlotRecipe,
+      //   switch: switchSlotRecipe,
+      progress: progressSlotRecipe
+    },
     // tokens: {
     //   colors: {
     //     primary: {

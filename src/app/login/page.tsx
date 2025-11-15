@@ -7,9 +7,53 @@ import {Logo} from "@/components/logo";
 import {AppContext} from "@/data/context";
 import Head from "next/head";
 import Link from "next/link";
-
+import {LoginFormRequest, LoginFormSchema} from "@/lib/form.service";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {useForm} from "react-hook-form";
+import axios from "axios";
+import {toaster} from "@/components/ui/toaster";
+import {useState} from "react";
+import {useRouter} from "next/navigation";
+import {useAuth} from "@/hooks/use-auth";
 
 export default function Login() {
+
+  const loadUser = useAuth((s) => s.loadUser);
+  const router = useRouter();
+  const [loading, setLoading] = useState<boolean>(false);
+  const {register, handleSubmit, formState: {errors}, setError} = useForm<LoginFormRequest>({
+    resolver: zodResolver(LoginFormSchema),
+    defaultValues: {
+      email: '',
+      password: ''
+    }
+  });
+
+  const onSubmit = async (data: LoginFormRequest) => {
+    setLoading(true)
+    axios.post('/api/auth/login', {email: data.email, password: data.password})
+      .then(() => {
+        setTimeout(async () => {
+          await loadUser();
+          router.push('/dashboard');
+        }, 1500);
+      }).catch((error) => {
+      setLoading(false)
+      const message = error.response?.data?.message || 'Something went wrong'
+      if (error.response?.status === 401) {
+        setError('email', {
+          type: 'server',
+          message,
+        })
+      } else {
+        toaster.error({
+          title: "",
+          description: message,
+        })
+      }
+    });
+  }
+
   return (
     <>
       <Head>
@@ -23,48 +67,50 @@ export default function Login() {
 
             <Logo mb={4} textStyle={'4xl'}/>
 
-            <Fieldset.Root size="lg" maxW={'lg'}>
-              <Stack>
-                <Fieldset.Legend>
-                  Sign In to Your Account
-                </Fieldset.Legend>
-                <Fieldset.HelperText>
-                  Enter your email and password to access your account.
-                </Fieldset.HelperText>
-                <Fieldset.HelperText>
-                  If you don't have an account, you can Please contact us <ChakraLink variant="underline"
-                                                                                textDecoration={'underline'}>here</ChakraLink>.
-                </Fieldset.HelperText>
-              </Stack>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <Fieldset.Root size="lg" maxW={'lg'}>
+                <Stack>
+                  <Fieldset.Legend>
+                    Sign In to Your Account
+                  </Fieldset.Legend>
+                  <Fieldset.HelperText>
+                    Enter your email and password to access your account.
+                  </Fieldset.HelperText>
+                  <Fieldset.HelperText>
+                    If you don't have an account, you can Please contact us <ChakraLink variant="underline"
+                                                                                        textDecoration={'underline'}>here</ChakraLink>.
+                  </Fieldset.HelperText>
+                </Stack>
 
-              <Fieldset.Content>
+                <Fieldset.Content>
 
-                <Field.Root invalid={false}>
-                  <Field.Label>Email address</Field.Label>
-                  <Input name="email" type="email" placeholder={'Enter your email address'}/>
-                  <Field.ErrorText>This is an error text</Field.ErrorText>
-                </Field.Root>
+                  <Field.Root invalid={!!errors.email}>
+                    <Field.Label>Email address</Field.Label>
+                    <Input {...register('email')} name="email" type="email" placeholder={'Enter your email address'}/>
+                    <Field.ErrorText>{errors.email?.message}</Field.ErrorText>
+                  </Field.Root>
 
-                <Field.Root invalid={false}>
-                  <Field.Label>Password</Field.Label>
-                  <PasswordInput name={'password'} placeholder={'Enter your password'}/>
-                  <Field.ErrorText>This is an error text</Field.ErrorText>
-                </Field.Root>
+                  <Field.Root invalid={!!errors.password}>
+                    <Field.Label>Password</Field.Label>
+                    <PasswordInput {...register('password')} name={'password'} placeholder={'Enter your password'}/>
+                    <Field.ErrorText>{errors.password?.message}</Field.ErrorText>
+                  </Field.Root>
 
-              </Fieldset.Content>
+                </Fieldset.Content>
 
-              <HStack justifyContent={'space-between'}>
-                <Button type="submit" alignSelf="flex-start">
-                  Sign in
-                  <MdArrowRightAlt/>
-                </Button>
-                <ChakraLink variant={'underline'} asChild>
-                  <Link href={'/forget-password'}>
-                    Forgot your password?
-                  </Link>
-                </ChakraLink>
-              </HStack>
-            </Fieldset.Root>
+                <HStack justifyContent={'space-between'}>
+                  <Button type="submit" alignSelf="flex-start" loading={loading}>
+                    Sign in
+                    <MdArrowRightAlt/>
+                  </Button>
+                  <ChakraLink variant={'underline'} asChild>
+                    <Link href={'/forget-password'}>
+                      Forgot your password?
+                    </Link>
+                  </ChakraLink>
+                </HStack>
+              </Fieldset.Root>
+            </form>
           </Box>
           <Box display={{base: 'none', md: 'block'}}>
             <svg width="300" height="300" viewBox="0 0 525 494" fill="none" xmlns="http://www.w3.org/2000/svg">
