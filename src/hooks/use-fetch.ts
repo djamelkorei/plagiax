@@ -1,58 +1,66 @@
-import {useEffect, useRef, useState} from "react";
-import type {ClientResponse} from "hono/client";
+'use client'
 
-type FetchFn<T> = (...args: unknown[]) => Promise<ClientResponse<T>>;
+import {useCallback, useEffect, useMemo, useState} from "react";
 
-export function useFetch<T>(fetchFn: FetchFn<T>, deps: unknown[] = [], auto: boolean = true) {
+export function useFetch<T>(
+  url: string,
+  params?: Record<string, string | number | boolean | null | undefined>,
+  options?: RequestInit
+) {
   const [data, setData] = useState<T | null>(null);
-  const [loading, setLoading] = useState(auto);
-  const [error, setError] = useState<Error | null>(null);
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<unknown>(null);
+  const [trigger, setTrigger] = useState(0); // used to force re-fetch
 
-  const fetchRef = useRef(fetchFn);
-  fetchRef.current = fetchFn;
+  // Build the final URL using useMemo
+  const finalUrl = useMemo(() => {
+    if (!params) return url;
 
-  useEffect(() => {
-    if (!auto) return
-    let cancelled = false;
+    if (typeof window === "undefined") {
+      return url;
+    }
 
-    async function run() {
-      try {
-        setLoading(true);
-        const res = await fetchRef.current();
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json = (await res.json()) as T;
-        if (!cancelled) {
-          setLoading(false)
-          setLoading((prev) => {
-            setData(json);
-            setError(null);
-            return prev
-          });
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setLoading(false)
-          setLoading((prev) => {
-            setError(err as Error)
-            return prev
-          });
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false)
-        }
+    const urlObj = new URL(url, window.location.origin);
+
+    for (const [key, value] of Object.entries(params)) {
+      if (value !== null && value !== undefined) {
+        urlObj.searchParams.append(key, String(value));
       }
     }
 
-    run();
+    return urlObj.toString();
+  }, [url, params]);
+
+  // Manual refetch function
+  const refetch = useCallback(() => {
+    setTrigger((n) => n + 1);
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+
+    fetch(finalUrl, options)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Network error: ${res.status}`);
+        }
+        return res.json() as Promise<T>;
+      })
+      .then((json) => {
+        if (active) setData(json);
+      })
+      .catch((err) => {
+        if (active) setError(err);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
 
     return () => {
-      cancelled = true;
+      active = false;
     };
-  }, [...deps, refreshKey, auto]);
+  }, [finalUrl, trigger, options]);
 
-  const refetch = () => setRefreshKey((k) => k + 1);
-
-  return {data, setData, loading, error, refetch};
+  return {data, loading, error, refetch};
 }

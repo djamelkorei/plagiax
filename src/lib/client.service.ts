@@ -1,5 +1,6 @@
 import axios from "axios";
 import {AuthDto} from "@/dto/user.dto";
+import {SubmissionStatsDto} from "@/dto/submission.dto";
 
 export type ApiResponse<T> =
   {
@@ -36,10 +37,35 @@ const api_auth_me = async (): Promise<ApiResponse<AuthDto>> => {
   }
 }
 
+const api_submissions_stats = async (): Promise<ApiResponse<SubmissionStatsDto[]>> => {
+  try {
+    const res = await axios.get<SubmissionStatsDto[]>("/api/submissions/stats");
+
+    return {
+      data: res.data,
+      hasError: false,
+      error: null
+    };
+  } catch (error: any) {
+    console.error("Error in api_submissions_stats:", error);
+    return {
+      data: null,
+      hasError: true,
+      error:
+        error?.response?.data?.message ??
+        error?.message ??
+        "Failed to fetch authenticated user",
+    };
+  }
+}
+
 export const ClientService = {
   api: {
     auth: {
       me: api_auth_me,
+    },
+    submissions: {
+      stats: api_submissions_stats
     }
   }
 }

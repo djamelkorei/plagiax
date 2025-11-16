@@ -48,7 +48,6 @@ export default function RootLayout({children,}: Readonly<{ children: ReactNode }
     <Provider>
 
 
-
       <Flex direction="column" h="full" w={'full'} gap={6}>
 
         <TopProgress/>

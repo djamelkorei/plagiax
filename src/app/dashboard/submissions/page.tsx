@@ -22,6 +22,7 @@ import {
   Pagination,
   Portal,
   RadioGroup,
+  Spinner,
   Stack,
   Switch,
   Table,
@@ -29,28 +30,20 @@ import {
 } from "@chakra-ui/react";
 import {DashboardContainer} from "@/components/dashboard-container";
 import {LuChevronLeft, LuChevronRight} from "react-icons/lu";
-import {useEffect, useState} from "react";
+import {ReactNode, useEffect, useState} from "react";
 import {SearchFilter} from "@/components/search-filter";
 import moment from "moment";
 import {AiOutlineDelete, AiOutlineFile, AiOutlinePercentage} from "react-icons/ai";
 import {PiFilePdf} from "react-icons/pi";
-import {IoAddOutline, IoCloudUploadOutline} from "react-icons/io5";
+import {IoAddOutline, IoAlertCircleOutline, IoCloudUploadOutline, IoWarningOutline} from "react-icons/io5";
 import {MdArrowRightAlt} from "react-icons/md";
 import {TbSquarePercentage} from "react-icons/tb";
-
-interface SubmissionDTO {
-  id: number,
-  fileName: string,
-  fileUrl: string,
-  studentName: string,
-  studentEmail: string,
-  postedDate: string,
-  status: 'active' | string,
-  similarityPercentage: number,
-  similarityFileUrl: string,
-  aiSimilarityPercentage: number,
-  aiSimilarityFileUrl: string,
-}
+import {useFetch} from "@/hooks/use-fetch";
+import {SubmissionDto} from "@/dto/submission.dto";
+import {Pageable} from "@/dto/pageable.dto";
+import {Tooltip} from "@/components/ui/tooltip";
+import {submissionDeleteAction} from "@/app/actions/submission-delete.action";
+import {FormHelper} from "@/helpers/form.helper";
 
 const dateToFullDateTimeString = (date: string | Date): string => {
   return moment(date).utcOffset(0)
@@ -79,61 +72,36 @@ const formSubmissionExclusionThresholdType = [
 
 export default function DashboardSubmissions() {
 
-  const loading = false;
+  const [page, setPage] = useState<number>(1);
+  const {data: pageable, loading, refetch} = useFetch<Pageable<SubmissionDto>>('/api/submissions', {page});
   const [, setTextFilter] = useState<string>('');
-  const [selectedSubmission, setSelectedSubmission] = useState<SubmissionDTO | null>(null);
+  const [selectedSubmission, setSelectedSubmission] = useState<SubmissionDto | null>(null);
 
+  const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
   const [modelOpen, setModelOpen] = useState(false);
   const [modelAddOpen, setModelAddOpen] = useState(false);
 
-  const submissionList: SubmissionDTO[] = [
-    {
-      id: 1,
-      fileName: 'file1.pdf',
-      fileUrl: 'https://example.com/file1',
-      studentName: 'John Doe',
-      studentEmail: 'john.doe@example.com',
-      postedDate: '2025-11-01 14:32',
-      status: 'active',
-      similarityPercentage: 85,
-      similarityFileUrl: 'https://example.com/similarity1',
-      aiSimilarityPercentage: 80,
-      aiSimilarityFileUrl: 'https://example.com/ai-similarity1',
-    },
-    {
-      id: 2,
-      fileName: 'file2.pdf',
-      fileUrl: 'https://example.com/file2',
-      studentName: 'Jane Smith',
-      studentEmail: 'jane.smith@example.com',
-      postedDate: '2025-11-02 13:32',
-      status: 'inactive',
-      similarityPercentage: 95,
-      similarityFileUrl: 'https://example.com/similarity2',
-      aiSimilarityPercentage: 85,
-      aiSimilarityFileUrl: 'https://example.com/ai-similarity2',
-    },
-    {
-      id: 3,
-      fileName: 'file3.pdf',
-      fileUrl: 'https://example.com/file3',
-      studentName: 'Alice Brown',
-      studentEmail: 'alice.brown@example.com',
-      postedDate: '2025-11-03',
-      status: 'active',
-      similarityPercentage: 75,
-      similarityFileUrl: 'https://example.com/similarity3',
-      aiSimilarityPercentage: 70,
-      aiSimilarityFileUrl: 'https://example.com/ai-similarity3',
-    },
-  ];
-
-  const deleteHandler = (item: SubmissionDTO) => {
+  const onDeleteModalOpen = (item: SubmissionDto) => {
     setSelectedSubmission(item);
     setSelectedSubmission(prev => {
       setModelOpen(true);
       return prev;
     })
+  };
+
+  const deleteHandler = (id: number | null) => {
+    if (id) {
+      setDeleteLoading(true);
+      submissionDeleteAction(FormHelper.toFormData({submissionId: id})).then((res) => {
+        if (res) {
+          refetch();
+        }
+      }).finally(() => {
+        setDeleteLoading(false);
+        setModelOpen(false);
+        setSelectedSubmission(null);
+      });
+    }
   }
 
   useEffect(() => {
@@ -169,20 +137,20 @@ export default function DashboardSubmissions() {
 
         </Flex>
 
-        <Box minHeight={'400px'} bg={'#fcfcfc'} border={'1px solid'} borderColor={'border'} borderRadius={'sm'}
+        <Box minHeight={'568px'} bg={'#fcfcfc'} border={'1px solid'} borderColor={'border'} borderRadius={'sm'}
              overflow={'hidden'}>
           <Table.Root variant="outline" size={'sm'}>
             <Table.Header>
               <Table.Row>
-                <Table.ColumnHeader w={'180px'}>Document</Table.ColumnHeader>
-                <Table.ColumnHeader w={'180px'}>Student</Table.ColumnHeader>
-                <Table.ColumnHeader w={'180px'}>Status</Table.ColumnHeader>
+                <Table.ColumnHeader w={'400px'}>Document</Table.ColumnHeader>
+                <Table.ColumnHeader w={'270px'}>Student</Table.ColumnHeader>
+                <Table.ColumnHeader w={'110px'}>Status</Table.ColumnHeader>
                 <Table.ColumnHeader w={'100px'}>
                   <Flex gap={1} alignItems={'center'}>
                     Similarity <AiOutlinePercentage/>
                   </Flex>
                 </Table.ColumnHeader>
-                <Table.ColumnHeader w={'100px'}>
+                <Table.ColumnHeader w={'160px'}>
                   <Flex gap={1} alignItems={'center'}>
                     AI Similarity<AiOutlinePercentage/>
                   </Flex>
@@ -191,68 +159,133 @@ export default function DashboardSubmissions() {
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {!loading && submissionList && submissionList.map((item, index) => (
+              {!loading && pageable?.data && pageable.data.map((item, index) => (
                 <Table.Row
                   key={item.id}
                   cursor={'pointer'}
-                  bg={'white'}
-                  borderBottomWidth={submissionList.length - 1 === index ? 0 : 1}
+                  bg={item.status === "DELETED" ? 'red.50' : 'white'}
+                  borderBottomWidth={pageable.data.length - 1 === index ? 0 : 1}
                 >
-                  <Table.Cell w={'180px'}>
+                  <Table.Cell w={'400px'}>
                     <HStack gap={4}>
                       <Button size={'xs'} variant={'surface'} colorPalette={'blue'}>
                         <AiOutlineFile/>
                       </Button>
-                      <Box>
-                        <Text>{item.fileName}</Text>
-                        <Text textStyle={'xs'} color={'gray.500'}>{dateToFullDateTimeString(item.postedDate)}</Text>
-                      </Box>
+                      <Tooltip content={item.original_filename}>
+                        <Box maxW="280px">
+                          <Text truncate>{item.original_filename}</Text>
+                          <Text textStyle={'xs'} color={'gray.500'}>{dateToFullDateTimeString(item.posted_at)}</Text>
+                        </Box>
+                      </Tooltip>
                     </HStack>
                   </Table.Cell>
-                  <Table.Cell>
+                  <Table.Cell w={'270px'}>
                     <HStack alignItems={'center'} gap={2}>
                       <Avatar.Root size={'xs'}>
-                        <Avatar.Fallback name={item.studentName}/>
+                        <Avatar.Fallback name={item.user_name}/>
                       </Avatar.Root>
-                      <Box>
-                        <Text>{item.studentName}</Text>
-                        <Text textStyle={'xs'} color={'gray.500'}>{item.studentEmail}</Text>
-                      </Box>
+                      <Tooltip content={item.user_email}>
+                        <Box maxW={'240px'}>
+                          <Text>{item.user_name}</Text>
+                          <Text truncate textStyle={'xs'} color={'gray.500'}>{item.user_email}</Text>
+                        </Box>
+                      </Tooltip>
                     </HStack>
                   </Table.Cell>
-                  <Table.Cell w={'180px'}>
-                    <Badge colorPalette={'teal'}>Completed</Badge>
+                  <Table.Cell w="110px">
+                    {item.status === "PROCESSING" && (
+                      <Badge colorScheme="orange" display="flex" alignItems="center" gap={1}>
+                        <Spinner size="sm"/>
+                        Processing...
+                      </Badge>
+                    )}
+                    {item.status === "COMPLETED" && (
+                      <Badge colorPalette="teal">Completed</Badge>
+                    )}
+                    {item.status === "IGNORED" && (
+                      <Tooltip content={item.error_message ?? "Error processing the document"}>
+                        <Badge colorPalette="red">Failed</Badge>
+                      </Tooltip>
+                    )}
+                    {item.status === "DELETED" && (
+                      <Badge variant={'subtle'} colorPalette="red">Deleted</Badge>
+                    )}
                   </Table.Cell>
                   <Table.Cell w={'100px'}>
-                    <Flex gap={3} alignItems={'center'}>
-                      <Flex gap={1} alignItems={'center'}>
-                        {item.similarityPercentage}
-                        <Text textStyle={'xs'}><AiOutlinePercentage/></Text>
+                    <ReportStatus submission={item}>
+                      <Flex gap={3} alignItems={'center'}>
+                        <Flex gap={1} alignItems={'center'}>
+                          <Text as={'span'} w={'5'} textAlign={'right'}>{item.similarity}</Text>
+                          <Text textStyle={'xs'}><AiOutlinePercentage/></Text>
+                        </Flex>
+                        <Button variant={'surface'} size={'xs'} px={1} colorPalette={'green'}>
+                          <PiFilePdf/>
+                        </Button>
                       </Flex>
+                    </ReportStatus>
+                  </Table.Cell>
+                  <Table.Cell w={'160px'}>
+                    <ReportStatus submission={item}>
+                      <Flex>
+                        {/* COMPLETE */}
+                        {item.ai_state === "COMPLETE" && (
+                          // AI Similarity Badge
+                          <Flex gap={3} alignItems={'center'}>
+                            <Flex gap={1} alignItems={'center'}>
+                              <Text as={'span'} w={'5'} textAlign={'right'}>
+                                {item.ai_similarity === 999 ? '* ' : item.ai_similarity}
+                              </Text>
+                              <Text textStyle={'xs'}><AiOutlinePercentage/></Text>
+                            </Flex>
+                            {/*Warning icon when no AI report exists*/}
+                            {!item.ai_link ? (
+                              <Tooltip
+                                content={
+                                  item.ai_error_message ??
+                                  `*% detected as AI\nAI detection includes the possibility of false positives. Although some text in this submission is likely AI generated, scores below the 20% threshold are not surfaced because they have a higher likelihood of false positives.`
+                                }
+                              >
+                                <Badge colorPalette="orange" p={'0.65rem'}>
+                                  <IoWarningOutline/>
+                                </Badge>
+                              </Tooltip>
+                            ) : (
+                              <Tooltip content="The AI report">
+                                <Button variant={'surface'} size={'xs'} px={1} colorPalette={'green'}>
+                                  <PiFilePdf/>
+                                </Button>
+                              </Tooltip>
+                            )}
+                          </Flex>
+                        )}
+                        {/* IGNORED */}
+                        {item.ai_state === "IGNORED" && (
+                          <Text color="gray.400" fontStyle="italic" mx={'auto'}>
+                            —
+                          </Text>
+                        )}
+                        {/* ERROR */}
+                        {item.ai_state !== "COMPLETE" && item.ai_state !== "IGNORED" && (
+                          <Tooltip content={item.ai_error_message ?? "Something went wrong"}>
+                            <Badge colorPalette="red" p={'0.65rem'} ms={'3rem'}>
+                              <IoAlertCircleOutline/>
+                            </Badge>
+                          </Tooltip>
+                        )}
+                      </Flex>
+                    </ReportStatus>
+                  </Table.Cell>
+                  <Table.Cell w={'100px'}>
 
-                      <Button variant={'surface'} size={'xs'} px={1} colorPalette={'green'}>
-                        <PiFilePdf/>
+                    {item.status !== 'DELETED' && (
+                      <Button variant={'surface'} colorPalette={'red'} size={'xs'} onClick={() => {
+                        onDeleteModalOpen(item);
+                      }}>
+                        Delete
+                        <AiOutlineDelete/>
                       </Button>
-                    </Flex>
-                  </Table.Cell>
-                  <Table.Cell w={'100px'}>
-                    <Flex gap={3} alignItems={'center'}>
-                      <Flex gap={1} alignItems={'center'}>
-                        {item.aiSimilarityPercentage}
-                        <Text textStyle={'xs'}><AiOutlinePercentage/></Text>
-                      </Flex>
-                      <Button variant={'surface'} size={'xs'} px={1} colorPalette={'green'}>
-                        <PiFilePdf/>
-                      </Button>
-                    </Flex>
-                  </Table.Cell>
-                  <Table.Cell w={'100px'}>
-                    <Button variant={'surface'} colorPalette={'red'} size={'xs'} onClick={() => {
-                      deleteHandler(item);
-                    }}>
-                      Delete
-                      <AiOutlineDelete/>
-                    </Button>
+                    )}
+
                   </Table.Cell>
                 </Table.Row>
               ))}
@@ -263,9 +296,9 @@ export default function DashboardSubmissions() {
                 </Table.Cell>
               </Table.Row>
 
-              <Table.Row display={!loading && (!submissionList || submissionList.length === 0) ? 'table-row' : 'none'}>
+              <Table.Row display={!loading && (!pageable?.data || pageable.data.length === 0) ? 'table-row' : 'none'}>
                 <Table.Cell colSpan={6} textAlign={'center'} py={'4rem'}>
-                  <Text opacity={'0.75'}>Now monitors available</Text>
+                  <Text opacity={'0.75'}>Now submissions available</Text>
                 </Table.Cell>
               </Table.Row>
 
@@ -274,14 +307,17 @@ export default function DashboardSubmissions() {
         </Box>
 
         <Flex gap={6} alignItems={'center'} flexDirection={{base: 'column', md: 'row'}}>
-          <Text textStyle={'sm'}>Total submissions: <b>{(2321).toLocaleString()}</b></Text>
+          <Text textStyle={'sm'}>Total submissions: <b>{pageable?.pagination?.total?.toLocaleString() ?? '-'}</b></Text>
 
           <Pagination.Root
             ms={'auto'}
-            count={200}
-            pageSize={10}
-            defaultPage={10}
+            count={pageable?.pagination?.total ?? 0}
+            pageSize={pageable?.pagination?.pageSize ?? 0}
+            page={page}
             siblingCount={2}
+            onPageChange={(details) => {
+              setPage(details.page)
+            }}
           >
             <ButtonGroup variant="ghost" size="sm">
               <Pagination.PrevTrigger asChild>
@@ -319,16 +355,19 @@ export default function DashboardSubmissions() {
                 </Dialog.Header>
                 <Dialog.Body>
                   <p>
-                    Deleting the file <Badge>{selectedSubmission?.fileName ?? ''}</Badge> is an irreversible action and
+                    Deleting the file <Badge>{selectedSubmission?.original_filename ?? ''}</Badge> is an irreversible
+                    action and
                     will
                     permanently remove it from our database.
                   </p>
                 </Dialog.Body>
                 <Dialog.Footer>
                   <Dialog.ActionTrigger asChild>
-                    <Button variant="outline">Cancel</Button>
+                    <Button disabled={deleteLoading} variant="outline">Cancel</Button>
                   </Dialog.ActionTrigger>
-                  <Button variant={'surface'} colorPalette={'red'}>Yes, confirm</Button>
+                  <Button loading={deleteLoading} variant={'surface'} colorPalette={'red'} onClick={() => {
+                    deleteHandler(selectedSubmission?.id ?? null);
+                  }}>Yes, confirm</Button>
                 </Dialog.Footer>
                 <Dialog.CloseTrigger asChild>
                   <CloseButton size="sm"/>
@@ -453,9 +492,9 @@ export default function DashboardSubmissions() {
                   </Fieldset.Root>
 
                   <Alert.Root size={'sm'} variant={'surface'} status={'warning'}>
-                    <Alert.Indicator />
+                    <Alert.Indicator/>
                     <Alert.Content>
-                      <Alert.Title />
+                      <Alert.Title/>
                       <Alert.Description>
                         The AI feature is available exclusively for English documents.
                       </Alert.Description>
@@ -463,7 +502,7 @@ export default function DashboardSubmissions() {
                   </Alert.Root>
 
                   <Alert.Root size={'sm'} variant={'surface'} status="info" colorPalette="gray">
-                    <Alert.Indicator />
+                    <Alert.Indicator/>
                     <Alert.Content>
                       <Alert.Description>
                         The file you are submitting will not be added to any repository.
@@ -494,4 +533,32 @@ export default function DashboardSubmissions() {
 }
 
 
+const ReportStatus = ({
+                        submission, children
+                      }: {
+  submission: SubmissionDto, children?: ReactNode
+}) => {
+
+  return (
+    <>
+      {submission.status === "PROCESSING"
+        ? (
+          <Badge colorPalette="gray" ms={'1rem'}>
+            <Spinner size="sm"/>
+            <AiOutlinePercentage/>
+          </Badge>
+        ) : (
+          submission.report_link ? (
+              <>
+                {children}
+              </>
+            )
+            : (
+              <span className="text-gray-400 text-sm italic">—</span>
+            )
+        )
+      }
+    </>
+  )
+}
 
