@@ -44,8 +44,8 @@ const dateToFullDateTimeString = (date: string | Date): string => {
 export default function DashboardSubmissions() {
 
   const [page, setPage] = useState<number>(1);
-  const {data: pageable, loading, refetch} = useFetch<Pageable<SubmissionDto>>('/api/submissions', {page});
-  const [, setTextFilter] = useState<string>('');
+  const [textFilter, setTextFilter] = useState<string>('');
+  const {data: pageable, loading, refetch} = useFetch<Pageable<SubmissionDto>>('/api/submissions', {page, q: textFilter});
   const [selectedSubmission, setSelectedSubmission] = useState<SubmissionDto | null>(null);
 
   const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
@@ -145,7 +145,7 @@ export default function DashboardSubmissions() {
                       </DownloadLink>
                       <Tooltip content={item.original_filename}>
                         <Box maxW="280px">
-                          <Text truncate>{item.original_filename}</Text>
+                          <Text truncate>{item.title}</Text>
                           <Text textStyle={'xs'} color={'gray.500'}>{dateToFullDateTimeString(item.posted_at)}</Text>
                         </Box>
                       </Tooltip>

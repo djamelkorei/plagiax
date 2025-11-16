@@ -14,6 +14,7 @@ export async function GET(req: Request) {
 
     const {searchParams} = new URL(req.url);
 
+    const q = Number(searchParams.get("q") ?? "");
     const page = Number(searchParams.get("page") ?? "1");
     const pageSize = Number(searchParams.get("pageSize") ?? "10");
 
@@ -28,6 +29,12 @@ export async function GET(req: Request) {
       from users u
       where u.deleted_at is null
         and u.instructor_id = ${authUser.id}
+        and (
+        ${q} is null
+          or ${q} = ''
+          or lower(u.name) like lower(concat('%', ${q}, '%'))
+          or lower(u.email) like lower(concat('%', ${q}, '%'))
+        )
       order by u.created_at desc
       limit ${pageSize} offset ${offset}
     `;

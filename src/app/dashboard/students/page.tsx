@@ -28,6 +28,8 @@ import {UserDTO} from "@/dto/user.dto";
 import {useFetch} from "@/hooks/use-fetch";
 import {Pageable} from "@/dto/pageable.dto";
 import {AddUserModal} from "@/components/modals/add-user.modal";
+import {FormHelper} from "@/helpers/form.helper";
+import {userDeleteAction} from "@/app/actions/user-delete.action";
 
 
 const dateToFullDateTimeString = (date: string | Date): string => {
@@ -37,21 +39,39 @@ const dateToFullDateTimeString = (date: string | Date): string => {
 
 export default function DashboardSubmissions() {
 
-  const [, setTextFilter] = useState<string>('');
+  const [textFilter, setTextFilter] = useState<string>('');
   const [selectedUser, setSelectedUser] = useState<UserDTO | null>(null);
 
   const [modelOpen, setModelOpen] = useState(false);
   const [modelAddOpen, setModelAddOpen] = useState(false);
 
+  const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
-  const {data: pageable, loading, refetch} = useFetch<Pageable<UserDTO>>('/api/users', {page});
+  const {data: pageable, loading, refetch} = useFetch<Pageable<UserDTO>>('/api/users', {page, q: textFilter});
 
-  const deleteHandler = (item: UserDTO) => {
+  const onDeleteModalOpen = (item: UserDTO) => {
     setSelectedUser(item);
     setSelectedUser(prev => {
       setModelOpen(true);
       return prev;
     })
+  }
+
+  const deleteHandler = (id: number | null) => {
+    if (id) {
+      setDeleteLoading(true);
+      userDeleteAction(FormHelper.toFormData({userId: id})).then((res) => {
+        if (res) {
+          refetch();
+        }
+      }).finally(() => {
+        setTimeout(() => {
+          setDeleteLoading(false);
+          setModelOpen(false);
+          setSelectedUser(null);
+        }, 300)
+      });
+    }
   }
 
   const editHandler = (item: UserDTO) => {
@@ -148,7 +168,7 @@ export default function DashboardSubmissions() {
                         <HiOutlinePencil/>
                       </Button>
                       <Button variant={'surface'} colorPalette={'red'} size={'xs'} onClick={() => {
-                        deleteHandler(item);
+                        onDeleteModalOpen(item);
                       }}>
                         Delete
                         <AiOutlineDelete/>
@@ -230,9 +250,11 @@ export default function DashboardSubmissions() {
                 </Dialog.Body>
                 <Dialog.Footer>
                   <Dialog.ActionTrigger asChild>
-                    <Button variant="outline">Cancel</Button>
+                    <Button disabled={deleteLoading} variant="outline">Cancel</Button>
                   </Dialog.ActionTrigger>
-                  <Button variant={'surface'} colorPalette={'red'}>Yes, confirm</Button>
+                  <Button loading={deleteLoading} onClick={() => {
+                    deleteHandler(selectedUser?.id ?? null)
+                  }} variant={'surface'} colorPalette={'red'}>Yes, confirm</Button>
                 </Dialog.Footer>
                 <Dialog.CloseTrigger asChild>
                   <CloseButton size="sm"/>
