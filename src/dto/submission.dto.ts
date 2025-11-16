@@ -14,7 +14,7 @@ export interface SubmissionDto {
 
   report_link: string,
   similarity: number,
-  status: 'PROCESSING' | 'COMPLETED' | 'IGNORED' | 'DELETED',
+  status:  'PENDING' | 'PROCESSING' | 'COMPLETED' | 'IGNORED' | 'DELETED',
   error_message: string,
 
   ai_link: string,

@@ -12,6 +12,8 @@
     "prisma": "prisma db pull --schema=src/prisma/schema.prisma  && prisma generate --schema=src/prisma/schema.prisma"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.932.0",
+    "@aws-sdk/s3-request-presigner": "^3.932.0",
     "@chakra-ui/charts": "^3.29.0",
     "@chakra-ui/react": "^3.29.0",
     "@emotion/react": "^11.14.0",

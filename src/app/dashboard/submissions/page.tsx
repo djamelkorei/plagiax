@@ -1,30 +1,20 @@
 'use client';
 
 import {
-  Alert,
   Avatar,
   Badge,
   Box,
   Button,
   ButtonGroup,
+  ButtonProps,
   CloseButton,
   Dialog,
-  Field,
-  Fieldset,
-  FileUpload,
   Flex,
-  For,
   HStack,
-  Icon,
   IconButton,
-  Input,
-  InputGroup,
   Pagination,
   Portal,
-  RadioGroup,
   Spinner,
-  Stack,
-  Switch,
   Table,
   Text
 } from "@chakra-ui/react";
@@ -35,40 +25,21 @@ import {SearchFilter} from "@/components/search-filter";
 import moment from "moment";
 import {AiOutlineDelete, AiOutlineFile, AiOutlinePercentage} from "react-icons/ai";
 import {PiFilePdf} from "react-icons/pi";
-import {IoAddOutline, IoAlertCircleOutline, IoCloudUploadOutline, IoWarningOutline} from "react-icons/io5";
-import {MdArrowRightAlt} from "react-icons/md";
-import {TbSquarePercentage} from "react-icons/tb";
+import {IoAddOutline, IoAlertCircleOutline, IoWarningOutline} from "react-icons/io5";
 import {useFetch} from "@/hooks/use-fetch";
 import {SubmissionDto} from "@/dto/submission.dto";
 import {Pageable} from "@/dto/pageable.dto";
 import {Tooltip} from "@/components/ui/tooltip";
 import {submissionDeleteAction} from "@/app/actions/submission-delete.action";
 import {FormHelper} from "@/helpers/form.helper";
+import {toaster} from "@/components/ui/toaster";
+import axios from "axios";
+import {AddSubmissionModal} from "@/components/modals/add-submission-modal";
 
 const dateToFullDateTimeString = (date: string | Date): string => {
   return moment(date).utcOffset(0)
     .format('MMM DD, YYYY, HH:mm');
 }
-
-const formSubmissionExclusion = [
-  {
-    field: 'exclusion_bibliographic',
-    label: 'Exclude bibliographic materials'
-  },
-  {
-    field: 'exclusion_quoted',
-    label: 'Exclude quoted materials'
-  },
-  {
-    field: 'exclusion_small_sources',
-    label: 'Exclude small sources (Small match exclusion type)'
-  },
-]
-
-const formSubmissionExclusionThresholdType = [
-  {label: "Words", field: "exclusion_type", value: 'words'},
-  {label: "Percentage", field: "exclusion_type", value: 'percentage'},
-]
 
 export default function DashboardSubmissions() {
 
@@ -168,9 +139,10 @@ export default function DashboardSubmissions() {
                 >
                   <Table.Cell w={'400px'}>
                     <HStack gap={4}>
-                      <Button size={'xs'} variant={'surface'} colorPalette={'blue'}>
+                      <DownloadLink submissionId={item.id} submissionType={"file"} size={'xs'} variant={'surface'}
+                                    colorPalette={'blue'}>
                         <AiOutlineFile/>
-                      </Button>
+                      </DownloadLink>
                       <Tooltip content={item.original_filename}>
                         <Box maxW="280px">
                           <Text truncate>{item.original_filename}</Text>
@@ -210,6 +182,9 @@ export default function DashboardSubmissions() {
                     {item.status === "DELETED" && (
                       <Badge variant={'subtle'} colorPalette="red">Deleted</Badge>
                     )}
+                    {item.status === "PENDING" && (
+                      <Badge variant={'subtle'} colorPalette="gray">Pending</Badge>
+                    )}
                   </Table.Cell>
                   <Table.Cell w={'100px'}>
                     <ReportStatus submission={item}>
@@ -218,9 +193,11 @@ export default function DashboardSubmissions() {
                           <Text as={'span'} w={'5'} textAlign={'right'}>{item.similarity}</Text>
                           <Text textStyle={'xs'}><AiOutlinePercentage/></Text>
                         </Flex>
-                        <Button variant={'surface'} size={'xs'} px={1} colorPalette={'green'}>
+                        <DownloadLink submissionId={item.id} submissionType={"report"} variant={'surface'} size={'xs'}
+                                      px={1}
+                                      colorPalette={'green'}>
                           <PiFilePdf/>
-                        </Button>
+                        </DownloadLink>
                       </Flex>
                     </ReportStatus>
                   </Table.Cell>
@@ -251,9 +228,11 @@ export default function DashboardSubmissions() {
                               </Tooltip>
                             ) : (
                               <Tooltip content="The AI report">
-                                <Button variant={'surface'} size={'xs'} px={1} colorPalette={'green'}>
+                                <DownloadLink submissionId={item.id} submissionType={"ai"} variant={'surface'}
+                                              size={'xs'} px={1}
+                                              colorPalette={'green'}>
                                   <PiFilePdf/>
-                                </Button>
+                                </DownloadLink>
                               </Tooltip>
                             )}
                           </Flex>
@@ -277,7 +256,7 @@ export default function DashboardSubmissions() {
                   </Table.Cell>
                   <Table.Cell w={'100px'}>
 
-                    {item.status !== 'DELETED' && (
+                    {(item.status !== 'DELETED' && item.status !== 'PROCESSING') && (
                       <Button variant={'surface'} colorPalette={'red'} size={'xs'} onClick={() => {
                         onDeleteModalOpen(item);
                       }}>
@@ -378,153 +357,9 @@ export default function DashboardSubmissions() {
         </Dialog.Root>
 
 
-        <Dialog.Root motionPreset="slide-in-bottom"
-                     size={'xl'}
-                     open={modelAddOpen}
-                     onOpenChange={(d) => setModelAddOpen(d.open)}>
-          <Portal>
-            <Dialog.Backdrop/>
-            <Dialog.Positioner>
-              <Dialog.Content>
-                <Dialog.Header>
-                  <Dialog.Title>Add new submission</Dialog.Title>
-                </Dialog.Header>
-                <Dialog.Body position={'relative'} display={'flex'} flexDirection={'column'} gap={4}>
-                  <Fieldset.Root>
-                    <Stack>
-                      <Fieldset.HelperText>
-                        Please fill out the following fields to submit your document for plagiarism checking. Each field
-                        is important to ensure your document is processed accurately.
-                      </Fieldset.HelperText>
-                    </Stack>
-
-                    <Fieldset.Content display={'flex'} flexDirection={{base: 'column', md: 'row'}} gap={6}>
-
-                      <Flex flexDirection={'column'} gap={4} flex={'1'} position={'relative'}>
-
-                        <Field.Root invalid={false} flex={1}>
-                          <Field.Label>Title</Field.Label>
-                          <Input name="title" type="text" placeholder={'Enter the document title'}/>
-                          <Field.ErrorText>This is an error text</Field.ErrorText>
-                        </Field.Root>
-
-                        <Box mb={3}>
-                          <Text fontWeight={'semibold'} mb={4}>Options ( exclusion )</Text>
-                          <Stack gap={4} align="flex-start">
-                            <For each={formSubmissionExclusion}>
-                              {(item) => (
-                                <Switch.Root key={item.field} size={'sm'} variant={'solid'} cursor={'pointer'}>
-                                  <Switch.HiddenInput name={item.field}/>
-                                  <Switch.Control/>
-                                  <Switch.Label>{item.label}</Switch.Label>
-                                </Switch.Root>
-                              )}
-                            </For>
-                          </Stack>
-                        </Box>
-
-                        <Flex gap={4} flex={1}
-                              flexDirection={'column'}
-                              border={'1px solid'} borderColor={'border'} p={3}
-                              borderRadius={4}>
-                          <Flex justifyContent={'space-between'}>
-                            <Text fontWeight={'semibold'}>
-                              Exclusion Threshold
-                            </Text>
-                            <RadioGroup.Root defaultValue="1" size={'sm'} variant={'outline'}>
-                              <HStack gap={3}>
-                                {formSubmissionExclusionThresholdType.map((item) => (
-                                  <RadioGroup.Item key={item.label} value={item.value} cursor={'pointer'}>
-                                    <RadioGroup.ItemHiddenInput name={item.field}/>
-                                    <RadioGroup.ItemIndicator/>
-                                    <RadioGroup.ItemText>{item.label}</RadioGroup.ItemText>
-                                  </RadioGroup.Item>
-                                ))}
-                              </HStack>
-                            </RadioGroup.Root>
-                          </Flex>
-
-                          <Field.Root>
-                            <Field.Label display={'none'}>Email</Field.Label>
-                            <InputGroup flex={1} startElement={<TbSquarePercentage/>}>
-                              <Input name={'exclusion_value'} size={'xs'} placeholder="Set threshold..."/>
-                            </InputGroup>
-                          </Field.Root>
-
-                        </Flex>
-                      </Flex>
-
-                      <FileUpload.Root
-                        w={{base: 'full', md: '350px'}}
-                        alignItems="stretch"
-                        maxFiles={1}
-                        accept={'.docx,.xlsx,.pptx,.ps,.pdf,.html, .rtf, .odt, .hwp, .txt'}
-                        cursor={'pointer'}
-                        gap={2}
-                      >
-                        <FileUpload.Label>Document</FileUpload.Label>
-                        <FileUpload.HiddenInput/>
-                        <FileUpload.Dropzone minHeight={'auto'}
-                                             height={'-webkit-fill-available'}
-                                             gap={2}
-                                             p={5}
-                                             bg={'gray.50'}
-                                             _hover={{bg: 'orange.50'}}>
-                          <Icon size="xl" color="fg.muted">
-                            <IoCloudUploadOutline/>
-                          </Icon>
-                          <FileUpload.DropzoneContent>
-                            <Box fontSize={'sm'} mb={4}>Drag and drop file here</Box>
-                            <Flex fontSize={'xs'} flexDirection={'column'} color="fg.muted">
-                              <Text as={'span'}>Uploaded file must be less than <b>100 MB</b></Text>
-                              <Text as={'span'}>Uploaded file must has less than <b>800 pages</b></Text>
-                              <Text as={'span'}>Files must contain <b>over 20 words</b> for a similarity report</Text>
-                              <Text as={'span'}>Supported file types for generating repots:</Text>
-                              <Text as={'span'} fontWeight={'bold'}>.docx, .xlsx, .pptx, .ps, .pdf, .html, .rtf, .odt,
-                                .hwp, .txt</Text>
-                            </Flex>
-                          </FileUpload.DropzoneContent>
-                        </FileUpload.Dropzone>
-                        <FileUpload.List clearable/>
-                      </FileUpload.Root>
-                    </Fieldset.Content>
-
-                  </Fieldset.Root>
-
-                  <Alert.Root size={'sm'} variant={'surface'} status={'warning'}>
-                    <Alert.Indicator/>
-                    <Alert.Content>
-                      <Alert.Title/>
-                      <Alert.Description>
-                        The AI feature is available exclusively for English documents.
-                      </Alert.Description>
-                    </Alert.Content>
-                  </Alert.Root>
-
-                  <Alert.Root size={'sm'} variant={'surface'} status="info" colorPalette="gray">
-                    <Alert.Indicator/>
-                    <Alert.Content>
-                      <Alert.Description>
-                        The file you are submitting will not be added to any repository.
-                      </Alert.Description>
-                    </Alert.Content>
-                  </Alert.Root>
-
-
-                </Dialog.Body>
-                <Dialog.Footer>
-                  <Dialog.ActionTrigger asChild>
-                    <Button variant="outline">Cancel</Button>
-                  </Dialog.ActionTrigger>
-                  <Button>Submit <MdArrowRightAlt/></Button>
-                </Dialog.Footer>
-                <Dialog.CloseTrigger asChild>
-                  <CloseButton size="sm"/>
-                </Dialog.CloseTrigger>
-              </Dialog.Content>
-            </Dialog.Positioner>
-          </Portal>
-        </Dialog.Root>
+        <AddSubmissionModal open={modelAddOpen} setOpen={setModelAddOpen} callback={() => {
+          refetch();
+        }}/>
 
       </Flex>
     </DashboardContainer>
@@ -562,3 +397,44 @@ const ReportStatus = ({
   )
 }
 
+interface DownloadLinkProps extends ButtonProps {
+  submissionId: number,
+  submissionType: 'file' | 'report' | 'ai'
+}
+
+const DownloadLink = ({submissionId, submissionType, ...rest}: DownloadLinkProps) => {
+
+  const [loading, setLoading] = useState(false);
+
+  const handleDownload = async () => {
+    setLoading(true);
+    axios.get(`/api/submissions/download?submissionId=${submissionId}&submissionType=${submissionType}`, {
+      responseType: "blob",
+    })
+      .then((res) => {
+        const url = URL.createObjectURL(res.data);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${submissionType}-${submissionId}.pdf`; // or whatever filename
+        a.click();
+        URL.revokeObjectURL(url);
+      })
+      .catch(() => {
+        toaster.error({
+          title: '',
+          description: `Error downloading ${submissionType === 'file' ? 'document' : 'report'}`
+        })
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  return (
+    <Button loading={loading} {...rest} onClick={() => {
+      handleDownload().then();
+    }}>
+      {rest.children}
+    </Button>
+  )
+}
