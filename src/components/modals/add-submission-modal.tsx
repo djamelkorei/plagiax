@@ -269,9 +269,9 @@ export const AddSubmissionModal = ({open, setOpen, callback}: AddSubmissionModal
                 </Dialog.Body>
                 <Dialog.Footer>
                   <Dialog.ActionTrigger asChild>
-                    <Button variant="outline">Cancel</Button>
+                    <Button disabled={formMethods.formState.isSubmitting} variant="outline">Cancel</Button>
                   </Dialog.ActionTrigger>
-                  <Button type={'submit'}>Submit <MdArrowRightAlt/></Button>
+                  <Button loading={formMethods.formState.isSubmitting} type={'submit'}>Submit <MdArrowRightAlt/></Button>
                 </Dialog.Footer>
                 <Dialog.CloseTrigger asChild>
                   <CloseButton size="sm"/>

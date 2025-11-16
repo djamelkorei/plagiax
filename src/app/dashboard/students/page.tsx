@@ -8,17 +8,11 @@ import {
   ButtonGroup,
   CloseButton,
   Dialog,
-  Field,
-  Fieldset,
   Flex,
   HStack,
   IconButton,
-  Input,
-  InputGroup,
   Pagination,
   Portal,
-  Stack,
-  Switch,
   Table,
   Text
 } from "@chakra-ui/react";
@@ -29,17 +23,12 @@ import {SearchFilter} from "@/components/search-filter";
 import moment from "moment";
 import {AiOutlineDelete} from "react-icons/ai";
 import {IoAddOutline} from "react-icons/io5";
-import {MdArrowRightAlt} from "react-icons/md";
-import {IoMdRefresh} from "react-icons/io";
 import {HiOutlinePencil} from "react-icons/hi";
+import {UserDTO} from "@/dto/user.dto";
+import {useFetch} from "@/hooks/use-fetch";
+import {Pageable} from "@/dto/pageable.dto";
+import {AddUserModal} from "@/components/modals/add-user.modal";
 
-interface UserDTO {
-  id: number,
-  studentName: string,
-  studentEmail: string,
-  createdDate: string,
-  status: 'active' | string,
-}
 
 const dateToFullDateTimeString = (date: string | Date): string => {
   return moment(date).utcOffset(0)
@@ -48,36 +37,14 @@ const dateToFullDateTimeString = (date: string | Date): string => {
 
 export default function DashboardSubmissions() {
 
-  const loading = false;
   const [, setTextFilter] = useState<string>('');
   const [selectedUser, setSelectedUser] = useState<UserDTO | null>(null);
 
   const [modelOpen, setModelOpen] = useState(false);
   const [modelAddOpen, setModelAddOpen] = useState(false);
 
-  const studentList: UserDTO[] = [
-    {
-      id: 1,
-      studentName: 'John Doe',
-      studentEmail: 'john.doe@example.com',
-      createdDate: '2025-11-01 14:32',
-      status: 'active',
-    },
-    {
-      id: 2,
-      studentName: 'Jane Smith',
-      studentEmail: 'jane.smith@example.com',
-      createdDate: '2025-11-02 13:32',
-      status: 'suspended',
-    },
-    {
-      id: 3,
-      studentName: 'Alice Brown',
-      studentEmail: 'alice.brown@example.com',
-      createdDate: '2025-11-03 07:32',
-      status: 'active',
-    },
-  ];
+  const [page, setPage] = useState<number>(1);
+  const {data: pageable, loading, refetch} = useFetch<Pageable<UserDTO>>('/api/users', {page});
 
   const deleteHandler = (item: UserDTO) => {
     setSelectedUser(item);
@@ -146,30 +113,30 @@ export default function DashboardSubmissions() {
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {!loading && studentList && studentList.map((item, index) => (
+              {!loading && pageable && pageable.data && pageable.data.map((item, index) => (
                 <Table.Row
                   key={item.id}
                   cursor={'pointer'}
                   bg={'white'}
-                  borderBottomWidth={studentList.length - 1 === index ? 0 : 1}
+                  borderBottomWidth={pageable.data.length - 1 === index ? 0 : 1}
                 >
                   <Table.Cell>
                     <HStack alignItems={'center'} gap={2}>
                       <Avatar.Root size={'xs'}>
-                        <Avatar.Fallback name={item.studentName}/>
+                        <Avatar.Fallback name={item.name}/>
                       </Avatar.Root>
                       <Box>
-                        <Text>{item.studentName}</Text>
-                        <Text textStyle={'xs'} color={'gray.500'}>{item.studentEmail}</Text>
+                        <Text>{item.name}</Text>
+                        <Text textStyle={'xs'} color={'gray.500'}>{item.email}</Text>
                       </Box>
                     </HStack>
                   </Table.Cell>
                   <Table.Cell w={'180px'}>
-                    {dateToFullDateTimeString(item.createdDate)}
+                    {dateToFullDateTimeString(item.created_at)}
                   </Table.Cell>
                   <Table.Cell w={'180px'}>
-                    <Badge colorPalette={item.status === 'active' ? 'teal' : 'orange'}>
-                      {item.status}
+                    <Badge colorPalette={item.active ? 'teal' : 'orange'}>
+                      {item.active ? 'Active' : 'Inactive'}
                     </Badge>
                   </Table.Cell>
                   <Table.Cell w={'100px'}>
@@ -197,7 +164,7 @@ export default function DashboardSubmissions() {
                 </Table.Cell>
               </Table.Row>
 
-              <Table.Row display={!loading && (!studentList || studentList.length === 0) ? 'table-row' : 'none'}>
+              <Table.Row display={!loading && (!pageable?.data || pageable.data.length === 0) ? 'table-row' : 'none'}>
                 <Table.Cell colSpan={6} textAlign={'center'} py={'4rem'}>
                   <Text opacity={'0.75'}>Now students available</Text>
                 </Table.Cell>
@@ -208,14 +175,17 @@ export default function DashboardSubmissions() {
         </Box>
 
         <Flex gap={6} alignItems={'center'} flexDirection={{base: 'column', md: 'row'}}>
-          <Text textStyle={'sm'}>Total students: <b>{(2321).toLocaleString()}</b></Text>
+          <Text textStyle={'sm'}>Total students: <b>{pageable?.pagination?.total.toLocaleString()}</b></Text>
 
           <Pagination.Root
             ms={'auto'}
-            count={200}
-            pageSize={10}
-            defaultPage={10}
+            count={pageable?.pagination?.total ?? 0}
+            pageSize={pageable?.pagination?.pageSize ?? 0}
+            page={page}
             siblingCount={2}
+            onPageChange={(details) => {
+              setPage(details.page)
+            }}
           >
             <ButtonGroup variant="ghost" size="sm">
               <Pagination.PrevTrigger asChild>
@@ -253,7 +223,7 @@ export default function DashboardSubmissions() {
                 </Dialog.Header>
                 <Dialog.Body>
                   <p>
-                    Deleting the file <Badge>{selectedUser?.studentName ?? ''}</Badge> is an irreversible action and
+                    Deleting the file <Badge>{selectedUser?.name ?? ''}</Badge> is an irreversible action and
                     will
                     permanently remove it from our database.
                   </p>
@@ -272,79 +242,9 @@ export default function DashboardSubmissions() {
           </Portal>
         </Dialog.Root>
 
-
-        <Dialog.Root motionPreset="slide-in-bottom"
-                     size={'lg'}
-                     open={modelAddOpen}
-                     onOpenChange={(d) => setModelAddOpen(d.open)}>
-          <Portal>
-            <Dialog.Backdrop/>
-            <Dialog.Positioner>
-              <Dialog.Content>
-                <Dialog.Header>
-                  <Dialog.Title>{selectedUser ? 'Edit' : 'Add new '} student</Dialog.Title>
-                </Dialog.Header>
-                <Dialog.Body position={'relative'} display={'flex'} flexDirection={'column'} gap={4}>
-                  <Fieldset.Root>
-                    <Stack>
-                      <Fieldset.HelperText>
-                        Please fill out the following fields to add a new student. All fields are required to ensure the
-                        student is added to the system correctly.
-                      </Fieldset.HelperText>
-                    </Stack>
-
-                    <Fieldset.Content>
-
-                      <Field.Root invalid={false} flex={1}>
-                        <Field.Label>Name</Field.Label>
-                        <Input name="name" type="text" placeholder={'Enter the student name'}/>
-                        <Field.ErrorText>This is an error text</Field.ErrorText>
-                      </Field.Root>
-
-                      <Field.Root invalid={false} flex={1}>
-                        <Field.Label>Email</Field.Label>
-                        <Input name="email" type="email" placeholder={'Enter the student email'}/>
-                        <Field.ErrorText>This is an error text</Field.ErrorText>
-                      </Field.Root>
-
-                      {!selectedUser && (
-                        <Field.Root invalid={false} flex={1}>
-                          <Field.Label>Password</Field.Label>
-                          <InputGroup flex="1"
-                                      endElement={<Button size={'2xs'}>Generate <IoMdRefresh/></Button>}>
-                            <Input name="password" type="text" placeholder={'Enter the student password'}/>
-                          </InputGroup>
-                          <Field.ErrorText>This is an error text</Field.ErrorText>
-                        </Field.Root>
-                      )}
-
-                      {selectedUser && (
-                        <Switch.Root size={'sm'} cursor={'pointer'}>
-                          <Switch.HiddenInput/>
-                          <Switch.Control/>
-                          <Switch.Label>is student active ?</Switch.Label>
-                        </Switch.Root>
-                      )}
-
-                    </Fieldset.Content>
-
-                  </Fieldset.Root>
-
-                </Dialog.Body>
-                <Dialog.Footer>
-                  <Dialog.ActionTrigger asChild>
-                    <Button variant="outline">Cancel</Button>
-                  </Dialog.ActionTrigger>
-                  <Button>{!selectedUser ? 'Submit' : 'Update'} <MdArrowRightAlt/></Button>
-                </Dialog.Footer>
-                <Dialog.CloseTrigger asChild>
-                  <CloseButton size="sm"/>
-                </Dialog.CloseTrigger>
-              </Dialog.Content>
-            </Dialog.Positioner>
-          </Portal>
-        </Dialog.Root>
-
+        <AddUserModal selectedUser={selectedUser} open={modelAddOpen} setOpen={setModelAddOpen} callback={() => {
+          refetch();
+        }}/>
       </Flex>
     </DashboardContainer>
   )

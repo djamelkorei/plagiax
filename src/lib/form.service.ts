@@ -18,3 +18,13 @@ export const AddSubmissionFormSchema = z.object({
 });
 
 export type AddSubmissionFormRequest = z.infer<typeof AddSubmissionFormSchema>;
+
+export const AddUserFormSchema = z.object({
+  id: z.number().optional(),
+  name: z.string().min(1, 'The name is required'),
+  email: z.email(),
+  password: z.string().min(1, 'The password is required'),
+  active: z.boolean(),
+});
+
+export type AddUserFormRequest = z.infer<typeof AddUserFormSchema>;

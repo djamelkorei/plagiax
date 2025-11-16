@@ -52,9 +52,9 @@ export async function submissionAddAction(formData: FormData): Promise<{ hasErro
   const parsed = AddSubmissionFormSchema.safeParse({
     ...body,
     exclusion_value: Number(body.exclusion_value),
-    exclusion_small_sources: Boolean(body.exclusion_small_sources),
-    exclusion_bibliographic: Boolean(body.exclusion_bibliographic),
-    exclusion_quoted: Boolean(body.exclusion_quoted),
+    exclusion_small_sources: body.exclusion_small_sources === 'true',
+    exclusion_bibliographic: body.exclusion_bibliographic === 'true',
+    exclusion_quoted: body.exclusion_quoted === 'true',
   });
 
   if (!parsed.success) return {hasError: true, message: "Invalid input"};
@@ -77,6 +77,8 @@ export async function submissionAddAction(formData: FormData): Promise<{ hasErro
 
     await s3Client.send(command);
 
+    const now = new Date();
+
     await prisma.submissions.create({
       data: {
         title: parsed.data.title ?? '',
@@ -90,6 +92,8 @@ export async function submissionAddAction(formData: FormData): Promise<{ hasErro
         exclusion_value: parsed.data.exclusion_value,
         original_filename: originalFileName,
         file_link: s3Path,
+        created_at: now,
+        updated_at: now
       },
     });
 

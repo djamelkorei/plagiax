@@ -27,6 +27,7 @@ export async function getServerUser(): Promise<AuthDto | null> {
     select u.id,
            u.email,
            u.name,
+           u.ai_enabled,
            u.membership_threshold,
            u.membership_length,
            u.membership_student_count,
@@ -38,13 +39,17 @@ export async function getServerUser(): Promise<AuthDto | null> {
                          from users u2
                          where s.user_id = u2.instructor_id
                             or s.user_id = u2.id))                              as submission_count,
-           (select count(*) from users where instructor_id = u.id and active)   as student_count,
+           (select count(*)
+            from users u2
+            where u2.instructor_id = u.id
+              and u2.deleted_at is null)                                        as student_count,
            if(u.membership_started_at <= curdate() and u.membership_ended_at >= curdate(),
               greatest(ceil(datediff(u.membership_ended_at, curdate())), 0), 0) as membership_days_left,
            u.membership_ended_at >= curdate()                                   as is_membership_active,
            r.name = 'instructor'                                                as is_instructor
     from users u
-           join model_has_roles mhr on mhr.model_id = u.id
+           join model_has_roles mhr
+                on mhr.model_id = u.id
            join roles r on mhr.role_id = r.id
     where u.id = ${Number(decoded.id)}
   `;
