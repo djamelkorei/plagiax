@@ -7,6 +7,8 @@ export const LoginFormSchema = z.object({
 
 export type LoginFormRequest = z.infer<typeof LoginFormSchema>;
 
+// =====================================================================================================================
+
 export const AddSubmissionFormSchema = z.object({
   title: z.string().min(1, 'The title is required'),
   file: z.any().refine((f) => f instanceof File, "The file is required"),
@@ -19,6 +21,9 @@ export const AddSubmissionFormSchema = z.object({
 
 export type AddSubmissionFormRequest = z.infer<typeof AddSubmissionFormSchema>;
 
+
+// =====================================================================================================================
+
 export const AddUserFormSchema = z.object({
   id: z.number().optional(),
   name: z.string().min(1, 'The name is required'),
@@ -28,3 +33,28 @@ export const AddUserFormSchema = z.object({
 });
 
 export type AddUserFormRequest = z.infer<typeof AddUserFormSchema>;
+
+
+// =====================================================================================================================
+
+export const AccountInfoFormSchema = z.object({
+  email: z.email(),
+  name: z.string().min(1, 'The name is required'),
+});
+
+export type AccountInfoFormRequest = z.infer<typeof AccountInfoFormSchema>;
+
+
+// =====================================================================================================================
+
+export const AccountPasswordFormSchema = z.object({
+  current_password: z.string().min(1, 'The current password is required'),
+  new_password: z.string().min(1, 'The new password is required'),
+  confirm_password: z.string().min(1, 'The confirm password is required'),
+}).refine((data) => data.new_password === data.confirm_password, {
+  path: ['confirm_password'],
+  message: 'Passwords do not match',
+});
+;
+
+export type AccountPasswordFormRequest = z.infer<typeof AccountPasswordFormSchema>;

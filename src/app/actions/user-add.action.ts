@@ -12,12 +12,12 @@ export async function userAddAction(formData: FormData): Promise<{ hasError: boo
     return {hasError: true, message: "Unauthorized"};
   }
 
-  // if (!authUser.is_membership_active) {
-  //   return {
-  //     hasError: true,
-  //     message: "You consume all your daily quota for today, come back tomorrow or upgrade your plan"
-  //   };
-  // }
+  if (!authUser.is_membership_active) {
+    return {
+      hasError: true,
+      message: "You consume all your daily quota for today, come back tomorrow or upgrade your plan"
+    };
+  }
 
   if (authUser.student_count + 1 > authUser.membership_student_count) {
     return {
