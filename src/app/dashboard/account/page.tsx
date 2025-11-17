@@ -3,7 +3,7 @@
 import {Button, Card, Field, Fieldset, Flex, Input, Skeleton, Stack} from "@chakra-ui/react";
 import {DashboardContainer} from "@/components/dashboard-container";
 import {MdArrowRightAlt} from "react-icons/md";
-import {FormProvider, useForm} from "react-hook-form";
+import {FormProvider, useForm, UseFormReset} from "react-hook-form";
 import {
   AccountInfoFormRequest,
   AccountInfoFormSchema,
@@ -144,7 +144,7 @@ const AccountPassword = () => {
   const [loading, setLoading] = useState(false);
   const loadUser = useAuth(state => state.loadUser);
 
-  const formMethods = useForm<AccountPasswordFormRequest>({
+  const {handleSubmit, reset, formState: {errors}, setError, register} = useForm<AccountPasswordFormRequest>({
     resolver: zodResolver(AccountPasswordFormSchema),
     defaultValues: {
       current_password: '',
@@ -153,11 +153,11 @@ const AccountPassword = () => {
     }
   });
 
-  const onSubmit = (data: AccountPasswordFormRequest) => {
+  const onSubmit = (data: AccountPasswordFormRequest, reset: UseFormReset<AccountPasswordFormRequest>) => {
     setLoading(true);
     accountPasswordUpdate(FormHelper.toFormData(data)).then((res) => {
       if (res.hasError) {
-        formMethods.setError('current_password', {
+        setError('current_password', {
           type: 'server',
           message: res.message,
         });
@@ -165,12 +165,7 @@ const AccountPassword = () => {
       } else {
         loadUser().then(() => {
           setTimeout(() => {
-            formMethods.reset({
-              current_password: '',
-              new_password: '',
-              confirm_password: ''
-            })
-
+            reset()
             toaster.success({
               title: '',
               description: 'updated successfully'
@@ -185,47 +180,45 @@ const AccountPassword = () => {
   return (
     <Card.Root>
       <Card.Body>
-        <FormProvider {...formMethods}>
-          <form onSubmit={formMethods.handleSubmit(onSubmit)}>
-            <Fieldset.Root>
+        <form onSubmit={handleSubmit((data) => onSubmit(data, reset))}>
+          <Fieldset.Root>
+            <Stack>
               <Stack>
-                <Stack>
-                  <Fieldset.Legend>Update Password</Fieldset.Legend>
-                  <Fieldset.HelperText>
-                    Ensure your account is using a long, random password to stay secure.
-                  </Fieldset.HelperText>
-                </Stack>
+                <Fieldset.Legend>Update Password</Fieldset.Legend>
+                <Fieldset.HelperText>
+                  Ensure your account is using a long, random password to stay secure.
+                </Fieldset.HelperText>
               </Stack>
+            </Stack>
 
-              <Fieldset.Content>
+            <Fieldset.Content>
 
-                <Field.Root invalid={!!formMethods.formState.errors.current_password} flex={1}>
-                  <Field.Label>Current Password</Field.Label>
-                  <Input {...formMethods.register('current_password')} type="text"
-                         placeholder={'Enter your current password'}/>
-                  <Field.ErrorText>{formMethods.formState.errors.current_password?.message}</Field.ErrorText>
-                </Field.Root>
+              <Field.Root invalid={!!errors.current_password} flex={1}>
+                <Field.Label>Current Password</Field.Label>
+                <Input {...register('current_password')} type="text"
+                       placeholder={'Enter your current password'}/>
+                <Field.ErrorText>{errors.current_password?.message}</Field.ErrorText>
+              </Field.Root>
 
-                <Field.Root invalid={!!formMethods.formState.errors.new_password} flex={1}>
-                  <Field.Label>New Password</Field.Label>
-                  <Input {...formMethods.register('new_password')} type="text" placeholder={'Enter your new password'}/>
-                  <Field.ErrorText>{formMethods.formState.errors.new_password?.message}</Field.ErrorText>
-                </Field.Root>
+              <Field.Root invalid={!!errors.new_password} flex={1}>
+                <Field.Label>New Password</Field.Label>
+                <Input {...register('new_password')} type="text" placeholder={'Enter your new password'}/>
+                <Field.ErrorText>{errors.new_password?.message}</Field.ErrorText>
+              </Field.Root>
 
-                <Field.Root invalid={!!formMethods.formState.errors.confirm_password} flex={1}>
-                  <Field.Label>Confirm Password</Field.Label>
-                  <Input {...formMethods.register('confirm_password')} type="text"
-                         placeholder={'Enter your confirm password'}/>
-                  <Field.ErrorText>{formMethods.formState.errors.confirm_password?.message}</Field.ErrorText>
-                </Field.Root>
+              <Field.Root invalid={!!errors.confirm_password} flex={1}>
+                <Field.Label>Confirm Password</Field.Label>
+                <Input {...register('confirm_password')} type="text"
+                       placeholder={'Enter your confirm password'}/>
+                <Field.ErrorText>{errors.confirm_password?.message}</Field.ErrorText>
+              </Field.Root>
 
-              </Fieldset.Content>
+            </Fieldset.Content>
 
-              <Button loading={loading} type='submit' w={'fit-content'}>Submit <MdArrowRightAlt/></Button>
+            <Button loading={loading} type='submit' w={'fit-content'}>Submit <MdArrowRightAlt/></Button>
 
-            </Fieldset.Root>
-          </form>
-        </FormProvider>
+          </Fieldset.Root>
+        </form>
       </Card.Body>
     </Card.Root>
   )
