@@ -4,6 +4,7 @@ import {prisma} from "@/prisma";
 import {getServerUser} from "@/lib/auth.service";
 import {AddUserFormSchema} from "@/lib/form.service";
 import bcrypt from "bcryptjs";
+import {MailService} from "@/lib/mail.service";
 
 export async function userAddAction(formData: FormData): Promise<{ hasError: boolean, message: string }> {
 
@@ -12,12 +13,12 @@ export async function userAddAction(formData: FormData): Promise<{ hasError: boo
     return {hasError: true, message: "Unauthorized"};
   }
 
-  if (!authUser.is_membership_active) {
-    return {
-      hasError: true,
-      message: "You consume all your daily quota for today, come back tomorrow or upgrade your plan"
-    };
-  }
+  // if (!authUser.is_membership_active) {
+  //   return {
+  //     hasError: true,
+  //     message: "You consume all your daily quota for today, come back tomorrow or upgrade your plan"
+  //   };
+  // }
 
   if (authUser.student_count + 1 > authUser.membership_student_count) {
     return {
@@ -29,7 +30,7 @@ export async function userAddAction(formData: FormData): Promise<{ hasError: boo
   const body = Object.fromEntries(formData);
   const parsed = AddUserFormSchema.safeParse({
     ...body,
-    id: Number(body.id),
+    id: Number.isSafeInteger(body.id) ? Number(body.id) : 0,
     active: body.active === 'true',
   });
 
@@ -72,18 +73,38 @@ export async function userAddAction(formData: FormData): Promise<{ hasError: boo
 
       const passwordHash = await bcrypt.hash(parsed.data.password, 7);
 
-      await prisma.users.create({
+      const user = await prisma.users.create({
         data: {
           name: parsed.data.name,
           email: parsed.data.email,
           password: passwordHash,
           instructor_id: authUser.id,
-          ai_enabled: authUser.ai_enabled,
+          ai_enabled: Boolean(authUser.ai_enabled),
           active: true,
           created_at: now,
           updated_at: now
         },
       });
+
+      const role = await prisma.roles.findFirst({
+        where: {
+          name: 'student'
+        }
+      });
+
+      await prisma.model_has_roles.create({
+        data: {
+          role_id: role!.id,
+          model_id: user.id,
+          model_type: 'App\\Models\\User'
+        }
+      })
+
+      if (user) {
+        const link = `${process.env.APP_URL}/login`;
+        await MailService.sendWelcomeEmail(user.name, user.email!, link, parsed.data.password);
+      }
+
     }
 
 

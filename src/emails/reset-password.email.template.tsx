@@ -8,34 +8,35 @@ interface EmailVerificationProps {
   link: string;
 }
 
-export default function ResetPasswordEmailTempla({userName, link}: EmailVerificationProps) {
+export default function ResetPasswordEmailTemplate({userName, link}: EmailVerificationProps) {
   return (
     <TemplateEmail
-      title={`Welcome to ${AppContext.name}`}
+      title={`Reset Your ${AppContext.name} Password`}
     >
       <TextEmail>
         Hi {userName},
       </TextEmail>
-      <TextEmail>
-        We're excited to have you on board 🎉. You’ll be able to improve
-        visibility throughout your writing process, ensuring originality and quality every step of the way.
-      </TextEmail>
 
       <TextEmail>
-        Your account has been successfully created. To get started, please use the one-time login link below to access
-        your account and set your password:
+        We received a request to reset your {AppContext.name} password. To proceed, please use the one-time link below
+        to set a
+        new password for your account:
       </TextEmail>
 
       <ButtonEmail href={link}>
-        Set Your Password & Sign In
+        Reset Your Password
       </ButtonEmail>
 
       <TextEmail>
-        This link is valid for a limited time, so be sure to use it soon.
+        ⚠️ This link will expire in 30 minutes, so be sure to use it promptly.
       </TextEmail>
 
       <TextEmail>
-        If you have any questions or need assistance, feel free to reach out to us at any time. We're here to help!
+        If you did not request a password reset, you can safely ignore this email—your account will remain secure.
+      </TextEmail>
+
+      <TextEmail>
+        If you have any questions or need assistance, feel free to reach out anytime. We’re here to help!
       </TextEmail>
 
     </TemplateEmail>

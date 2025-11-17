@@ -2,6 +2,8 @@ import jwt from "jsonwebtoken";
 import {cookies} from "next/headers";
 import {prisma} from "@/prisma";
 import {AuthDto} from "@/dto/user.dto";
+import crypto from "crypto";
+import bcrypt from "bcryptjs";
 
 export type JwtPayload = {
   id: string;
@@ -66,4 +68,23 @@ export async function getServerUser(): Promise<AuthDto | null> {
     }
   }
   return null;
+}
+
+export async function generateAuthResetLink(email: string) {
+  const plainToken = crypto.randomBytes(32).toString("hex");
+  const hashedToken = await bcrypt.hash(plainToken, 10);
+
+  await prisma.password_reset_tokens.deleteMany({
+    where: {email},
+  });
+
+  await prisma.password_reset_tokens.create({
+    data: {
+      email,
+      token: hashedToken,
+      created_at: new Date(),
+    },
+  });
+
+  return `${process.env.APP_URL}/reset-password?token=${plainToken}&email=${encodeURIComponent(email)}`;
 }
