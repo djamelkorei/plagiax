@@ -37,9 +37,8 @@ const sendWelcomeEmail = async (userName: string, userEmail: string, link: strin
   await sendEmail(userEmail, subject, template);
 }
 
-const sendResetPasswordEmail = async (userName: string, userEmail: string) => {
+const sendResetPasswordEmail = async (userName: string, userEmail: string, link: string) => {
   const subject = `Reset Your ${AppContext.name} Password`;
-  const link = "";
   const template = <ResetPasswordEmailTempla userName={userName} link={link}/>;
   await sendEmail(userEmail, subject, template);
 }

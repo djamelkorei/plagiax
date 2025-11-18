@@ -58,3 +58,27 @@ export const AccountPasswordFormSchema = z.object({
 ;
 
 export type AccountPasswordFormRequest = z.infer<typeof AccountPasswordFormSchema>;
+
+
+// =====================================================================================================================
+
+export const PasswordResetInitFormSchema = z.object({
+  email: z.email()
+});
+
+export type PasswordResetInitFormRequest = z.infer<typeof PasswordResetInitFormSchema>;
+
+
+// =====================================================================================================================
+
+export const PasswordResetCompleteFormSchema = z.object({
+  email: z.email(),
+  token: z.string().min(1, 'The token is required'),
+  password: z.string().min(1, 'The password is required'),
+  confirm_password: z.string().min(1, 'The confirm password is required'),
+}).refine((data) => data.password === data.confirm_password, {
+  path: ['confirm_password'],
+  message: 'Passwords do not match',
+});
+
+export type PasswordResetCompleteFormRequest = z.infer<typeof PasswordResetCompleteFormSchema>;
