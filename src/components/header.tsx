@@ -10,6 +10,7 @@ import {Activity} from "react";
 import {useAuth} from "@/hooks/use-auth";
 import {IoLogOutOutline} from "react-icons/io5";
 import {logoutAction} from "@/app/actions/logout.action";
+import {Authorize} from "@/components/authorize";
 
 
 export const Header = () => {
@@ -53,9 +54,13 @@ export const Header = () => {
           <Activity mode={isAuthenticated || (isDashboardPage && isAuthLoading) ? 'visible' : 'hidden'}>
             <Skeleton loading={isAuthLoading}>
               <Flex gap={6} alignItems={'center'}>
-                <NavLink text={'Dashboard'} href={'/dashboard'}/>
+                <Authorize roles={['instructor']}>
+                  <NavLink text={'Dashboard'} href={'/dashboard'}/>
+                </Authorize>
                 <NavLink text={'Submissions'} href={'/dashboard/submissions'}/>
-                <NavLink text={'Students'} href={'/dashboard/students'}/>
+                <Authorize roles={['instructor']}>
+                  <NavLink text={'Students'} href={'/dashboard/students'}/>
+                </Authorize>
               </Flex>
             </Skeleton>
           </Activity>

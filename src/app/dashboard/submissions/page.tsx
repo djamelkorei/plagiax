@@ -35,6 +35,7 @@ import {FormHelper} from "@/helpers/form.helper";
 import {toaster} from "@/components/ui/toaster";
 import axios from "axios";
 import {AddSubmissionModal} from "@/components/modals/add-submission-modal";
+import {Authorize} from "@/components/authorize";
 
 const dateToFullDateTimeString = (date: string | Date): string => {
   return moment(date).utcOffset(0)
@@ -45,7 +46,10 @@ export default function DashboardSubmissions() {
 
   const [page, setPage] = useState<number>(1);
   const [textFilter, setTextFilter] = useState<string>('');
-  const {data: pageable, loading, refetch} = useFetch<Pageable<SubmissionDto>>('/api/submissions', {page, q: textFilter});
+  const {data: pageable, loading, refetch} = useFetch<Pageable<SubmissionDto>>('/api/submissions', {
+    page,
+    q: textFilter
+  });
   const [selectedSubmission, setSelectedSubmission] = useState<SubmissionDto | null>(null);
 
   const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
@@ -114,7 +118,9 @@ export default function DashboardSubmissions() {
             <Table.Header>
               <Table.Row>
                 <Table.ColumnHeader w={'400px'}>Document</Table.ColumnHeader>
-                <Table.ColumnHeader w={'270px'}>Student</Table.ColumnHeader>
+                <Authorize roles={['instructor']}>
+                  <Table.ColumnHeader w={'270px'}>Student</Table.ColumnHeader>
+                </Authorize>
                 <Table.ColumnHeader w={'110px'}>Status</Table.ColumnHeader>
                 <Table.ColumnHeader w={'100px'}>
                   <Flex gap={1} alignItems={'center'}>
@@ -151,19 +157,21 @@ export default function DashboardSubmissions() {
                       </Tooltip>
                     </HStack>
                   </Table.Cell>
-                  <Table.Cell w={'270px'}>
-                    <HStack alignItems={'center'} gap={2}>
-                      <Avatar.Root size={'xs'}>
-                        <Avatar.Fallback name={item.user_name}/>
-                      </Avatar.Root>
-                      <Tooltip content={item.user_email}>
-                        <Box maxW={'240px'}>
-                          <Text>{item.user_name}</Text>
-                          <Text truncate textStyle={'xs'} color={'gray.500'}>{item.user_email}</Text>
-                        </Box>
-                      </Tooltip>
-                    </HStack>
-                  </Table.Cell>
+                  <Authorize roles={['instructor']}>
+                    <Table.Cell w={'270px'}>
+                      <HStack alignItems={'center'} gap={2}>
+                        <Avatar.Root size={'xs'}>
+                          <Avatar.Fallback name={item.user_name}/>
+                        </Avatar.Root>
+                        <Tooltip content={item.user_email}>
+                          <Box maxW={'240px'}>
+                            <Text>{item.user_name}</Text>
+                            <Text truncate textStyle={'xs'} color={'gray.500'}>{item.user_email}</Text>
+                          </Box>
+                        </Tooltip>
+                      </HStack>
+                    </Table.Cell>
+                  </Authorize>
                   <Table.Cell w="110px">
                     {item.status === "PROCESSING" && (
                       <Badge colorScheme="orange" display="flex" alignItems="center" gap={1}>

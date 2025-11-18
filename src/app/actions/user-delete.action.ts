@@ -10,7 +10,7 @@ export async function userDeleteAction(formData: FormData) {
     return
   }
   const auth = await getServerUser();
-  if (!auth) {
+  if (!auth || !auth.is_instructor) {
     return
   }
 

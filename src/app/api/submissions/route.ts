@@ -44,8 +44,7 @@ export async function GET(req: Request) {
              join users u on u.id = s.user_id
       where s.deleted_at is null
         and s.status != 'DELETED'
-        and (u.id = ${authUser.id}
-        or u.instructor_id = ${authUser.id})
+        and (u.id = ${authUser.id} or u.instructor_id = ${authUser.id})
         and (
         ${q} is null
           or ${q} = ''

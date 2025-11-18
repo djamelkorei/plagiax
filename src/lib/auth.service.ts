@@ -29,27 +29,31 @@ export async function getServerUser(): Promise<AuthDto | null> {
     select u.id,
            u.email,
            u.name,
-           u.ai_enabled,
-           u.membership_threshold,
-           u.membership_length,
-           u.membership_student_count,
-           u.membership_started_at,
-           u.membership_ended_at,
+           r.name = 'instructor'                                              as is_instructor,
+           coalesce(u.ai_enabled, ins.ai_enabled)                             as ai_enabled,
+           coalesce(u.membership_threshold, ins.membership_threshold)         as membership_threshold,
+           coalesce(u.membership_length, ins.membership_length)               as membership_length,
+           coalesce(u.membership_student_count, ins.membership_student_count) as membership_student_count,
+           coalesce(u.membership_started_at, ins.membership_started_at)       as membership_started_at,
+           coalesce(u.membership_ended_at, ins.membership_ended_at)           as membership_ended_at,
+           coalesce(u.membership_ended_at, ins.membership_ended_at) >=
+           curdate()                                                          as is_membership_active,
+           if(coalesce(u.membership_started_at, ins.membership_started_at) <= curdate()
+                and coalesce(u.membership_ended_at, ins.membership_ended_at) >= curdate(),
+              greatest(ceil(datediff(coalesce(u.membership_ended_at, ins.membership_ended_at), curdate())), 0),
+              0)                                                              as membership_days_left,
            (select count(*)
             from submissions s
             where exists(select 1
                          from users u2
                          where s.user_id = u2.instructor_id
-                            or s.user_id = u2.id))                              as submission_count,
+                            or s.user_id = u2.id))                            as submission_count,
            (select count(*)
             from users u2
             where u2.instructor_id = u.id
-              and u2.deleted_at is null)                                        as student_count,
-           if(u.membership_started_at <= curdate() and u.membership_ended_at >= curdate(),
-              greatest(ceil(datediff(u.membership_ended_at, curdate())), 0), 0) as membership_days_left,
-           u.membership_ended_at >= curdate()                                   as is_membership_active,
-           r.name = 'instructor'                                                as is_instructor
+              and u2.deleted_at is null)                                      as student_count
     from users u
+           left join users ins on ins.id = u.instructor_id
            join model_has_roles mhr
                 on mhr.model_id = u.id
            join roles r on mhr.role_id = r.id

@@ -1,10 +1,15 @@
 import type {NextRequest} from "next/server";
 import {NextResponse} from "next/server";
-import {verifyToken} from "@/lib/auth.service";
+import {getServerUser, verifyToken} from "@/lib/auth.service";
 
 const dashboardRoute = '/dashboard';
 
-export function proxy(req: NextRequest) {
+const instructorRoutes = [
+  '/dashboard',
+  '/dashboard/students',
+]
+
+export async function proxy(req: NextRequest) {
 
   const {pathname} = req.nextUrl;
   const isDashboardPath = pathname.startsWith(dashboardRoute);
@@ -17,6 +22,15 @@ export function proxy(req: NextRequest) {
     if (!isValidToken) {
       // Must be logged in → redirect to login
       return createUnauthorizedResponse(req, pathname);
+    }
+
+    // Page authroization check
+    if (instructorRoutes.filter(r => pathname === r).length > 0) {
+      const user = await getServerUser();
+      if (!user?.is_instructor) {
+        const redirectUrl = new URL("/dashboard/submissions", req.url);
+        return NextResponse.redirect(redirectUrl);
+      }
     }
 
     // Valid token → allow access

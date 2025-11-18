@@ -8,7 +8,7 @@ export async function GET(req: Request) {
   try {
     const authUser = await getServerUser();
 
-    if (!authUser) {
+    if (!authUser || !authUser.is_instructor) {
       return NextResponse.json({message: "Unauthorized"}, {status: 401});
     }
 
