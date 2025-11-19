@@ -10,7 +10,6 @@ import Link from "next/link";
 import {LoginFormRequest, LoginFormSchema} from "@/lib/form.service";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useForm} from "react-hook-form";
-import {toaster} from "@/components/ui/toaster";
 import {useState} from "react";
 import {useRouter} from "next/navigation";
 import {useAuth} from "@/hooks/use-auth";
@@ -33,26 +32,27 @@ export default function Login() {
   const onSubmit = async (data: LoginFormRequest) => {
     setLoading(true);
     loginAction(FormHelper.toFormData({email: data.email, password: data.password}))
-      .then(() => {
-        setTimeout(async () => {
-          await loadUser();
-          router.push('/dashboard');
-        }, 500);
-      }).catch((error) => {
-      setLoading(false)
-      const message = error.response?.data?.message || 'Something went wrong'
-      if (error.response?.status === 401) {
-        setError('email', {
-          type: 'server',
-          message,
-        })
-      } else {
-        toaster.error({
-          title: "",
-          description: message,
-        })
-      }
-    });
+      .then((res) => {
+        if (res.success) {
+          setTimeout(async () => {
+            await loadUser().then((role) => {
+              if (role === 'instructor') {
+                router.push('/dashboard');
+              } else {
+                router.push('/dashboard/submissions');
+              }
+            });
+          }, 500);
+        } else {
+          setLoading(false)
+          const message = res.error || 'Something went wrong'
+          setError('email', {
+            type: 'server',
+            message,
+          })
+        }
+
+      });
   }
 
   return (

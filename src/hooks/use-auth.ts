@@ -8,7 +8,7 @@ interface AuthState {
   isAuthenticated: boolean
   setAuth: (auth: AuthDto) => void
   logout: () => void
-  loadUser: () => Promise<boolean>,
+  loadUser: () => Promise<string>,
   isAuthLoading: boolean
 }
 
@@ -25,7 +25,8 @@ const anonymous: AuthDto = {
   membership_ended_at: new Date(),
   membership_days_left: 0,
   is_membership_active: false,
-  is_instructor: false
+  is_instructor: false,
+  ai_enabled: false
 }
 
 export const useAuth = create<AuthState>((set) => ({
@@ -50,7 +51,7 @@ export const useAuth = create<AuthState>((set) => ({
           isAuthLoading: false,
           auth: {...response.data}
         });
-        return true
+        return response.data.is_instructor ? 'instructor' : 'student'
       }
     } catch (error) {
       console.error('Failed to load user:', error)
@@ -60,6 +61,6 @@ export const useAuth = create<AuthState>((set) => ({
       isAuthLoading: false,
       auth: anonymous
     })
-    return false
+    return ''
   },
 }))

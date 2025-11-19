@@ -57,6 +57,7 @@ export default function DashboardAccount() {
 const AccountDetails = ({authUser}: { authUser: AuthDto }) => {
 
   const [loading, setLoading] = useState(false);
+  const isAuthLoading = useAuth(state => state.isAuthLoading);
   const loadUser = useAuth(state => state.loadUser);
 
   const formMethods = useForm<AccountInfoFormRequest>({
@@ -66,6 +67,15 @@ const AccountDetails = ({authUser}: { authUser: AuthDto }) => {
       email: authUser?.email ?? '',
     }
   });
+
+  useEffect(() => {
+    if (!isAuthLoading && authUser?.id) {
+      formMethods.reset({
+        name: authUser.name,
+        email: authUser.email,
+      });
+    }
+  }, [authUser, isAuthLoading]);
 
   const onSubmit = (data: AccountInfoFormRequest) => {
     setLoading(true);

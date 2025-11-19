@@ -18,7 +18,9 @@ export async function userDeleteAction(formData: FormData) {
 
     const result = await prisma.$executeRaw`
       update users
-      set deleted_at = now()
+      set deleted_at     = now(),
+          email_previous = email,
+          email          = null
       where id = ${userId}
         and instructor_id = ${auth.id}
     `;
