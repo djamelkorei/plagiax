@@ -20,22 +20,22 @@ import {
   Switch,
   Text,
 } from "@chakra-ui/react";
-import { TbSquarePercentage } from "react-icons/tb";
-import { IoCloudUploadOutline } from "react-icons/io5";
-import { MdArrowRightAlt } from "react-icons/md";
-import { Dispatch, SetStateAction } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import type { Dispatch, SetStateAction } from "react";
 import {
   FormProvider,
   useForm,
   useFormContext,
   useWatch,
 } from "react-hook-form";
+import { IoCloudUploadOutline } from "react-icons/io5";
+import { MdArrowRightAlt } from "react-icons/md";
+import { TbSquarePercentage } from "react-icons/tb";
+import { submissionAddAction } from "@/app/actions/submission-add.action";
 import {
-  AddSubmissionFormRequest,
+  type AddSubmissionFormRequest,
   AddSubmissionFormSchema,
 } from "@/lib/form.service";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { submissionAddAction } from "@/app/actions/submission-add.action";
 
 interface AddSubmissionModalProps {
   open: boolean;
@@ -223,9 +223,9 @@ export const AddSubmissionModal = ({
                               variant={"outline"}
                               value={exclusionType}
                               onValueChange={(details) => {
-                                // @ts-ignore
                                 formMethods.setValue(
                                   "exclusion_type",
+                                  // @ts-expect-error
                                   details.value,
                                 );
                               }}
