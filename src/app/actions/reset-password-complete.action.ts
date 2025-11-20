@@ -1,5 +1,6 @@
 "use server";
 
+import type { Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { PasswordResetCompleteFormSchema } from "@/lib/form.service";
 import { prisma } from "@/prisma";
@@ -37,7 +38,7 @@ export async function resetPasswordCompleteAction(
 
   if (user) {
     const passwordHash = await bcrypt.hash(parsed.data.password, 7);
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       await tx.users.update({
         data: {
           password: passwordHash,
