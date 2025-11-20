@@ -78,7 +78,7 @@ export const AddSubmissionModal = ({
     resolver: zodResolver(AddSubmissionFormSchema),
     defaultValues: {
       title: "",
-      exclusion_bibliographic: false,
+      exclusion_bibliographic: true,
       exclusion_quoted: false,
       exclusion_small_sources: false,
       exclusion_type: "none",
