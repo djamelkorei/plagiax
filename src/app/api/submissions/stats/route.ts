@@ -1,14 +1,14 @@
-import {NextResponse} from "next/server";
-import {getServerUser} from "@/lib/auth.service";
-import {prisma} from "@/prisma";
-import {SubmissionStatsDto} from "@/dto/submission.dto";
+import { NextResponse } from "next/server";
+import type { SubmissionStatsDto } from "@/dto/submission.dto";
+import { getServerUser } from "@/lib/auth.service";
+import { prisma } from "@/prisma";
 
 export async function GET() {
   try {
     const authUser = await getServerUser();
 
     if (!authUser || !authUser.is_instructor) {
-      return NextResponse.json({message: "Unauthorized"}, {status: 401});
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     const submissionStatsLines = await prisma.$queryRaw<SubmissionStatsDto[]>`
@@ -24,15 +24,17 @@ export async function GET() {
       limit 10
     `;
 
-    return NextResponse.json(submissionStatsLines.map(line => {
-      return {
-        month: Number(line.month),
-        year: Number(line.year),
-        count: Number(line.count),
-      }
-    }));
+    return NextResponse.json(
+      submissionStatsLines.map((line) => {
+        return {
+          month: Number(line.month),
+          year: Number(line.year),
+          count: Number(line.count),
+        };
+      }),
+    );
   } catch (err) {
     console.error(err);
-    return NextResponse.json({message: "Server error"}, {status: 500});
+    return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }

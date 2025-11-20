@@ -1,42 +1,49 @@
-import {NextRequest, NextResponse} from "next/server";
-import {prisma} from "@/prisma";
-import {getServerUser} from "@/lib/auth.service";
-import {GetObjectCommand, S3Client} from "@aws-sdk/client-s3";
+import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { type NextRequest, NextResponse } from "next/server";
+import { getServerUser } from "@/lib/auth.service";
+import { prisma } from "@/prisma";
 
 // S3 config
 const s3Client = new S3Client({
   region: process.env.AWS_DEFAULT_REGION!,
   credentials: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
   },
   bucketEndpoint: true,
   forcePathStyle: process.env.AWS_S3_USE_PATH_STYLE_ENDPOINT! === "true",
 });
 
 export async function GET(req: NextRequest) {
-
-  const submissionId = Number(req.nextUrl.searchParams.get('submissionId') ?? 0);
-  const submissionType: "file" | "report" | "ai" | string = req.nextUrl.searchParams.get('submissionType') ?? '';
+  const submissionId = Number(
+    req.nextUrl.searchParams.get("submissionId") ?? 0,
+  );
+  const submissionType: "file" | "report" | "ai" | string =
+    req.nextUrl.searchParams.get("submissionType") ?? "";
 
   const auth = await getServerUser();
-  if (!auth) return NextResponse.json({message: "Unauthorized"}, {status: 401});
+  if (!auth)
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
   // Load submission
   const submission = await prisma.submissions.findFirst({
-    where: {id: Number(submissionId)},
+    where: { id: Number(submissionId) },
   });
 
-  if (!submission || submission.status === 'DELETED' || submission.deleted_at) {
-    return NextResponse.json({message: "Not Found"}, {status: 404});
+  if (!submission || submission.status === "DELETED" || submission.deleted_at) {
+    return NextResponse.json({ message: "Not Found" }, { status: 404 });
   }
 
   const submissionUser = await prisma.users.findFirst({
-    where: {id: Number(submission.user_id)},
+    where: { id: Number(submission.user_id) },
   });
 
-  if (!submissionUser || (Number(submissionUser.id) != auth.id && Number(submissionUser.instructor_id) != auth.id)) {
-    return NextResponse.json({message: "Not Found"}, {status: 404});
+  if (
+    !submissionUser ||
+    (Number(submissionUser.id) != auth.id &&
+      Number(submissionUser.instructor_id) != auth.id)
+  ) {
+    return NextResponse.json({ message: "Not Found" }, { status: 404 });
   }
 
   // Pick correct link
@@ -55,7 +62,7 @@ export async function GET(req: NextRequest) {
   }
 
   if (!downloadLink) {
-    return NextResponse.json({message: "No file available"}, {status: 404});
+    return NextResponse.json({ message: "No file available" }, { status: 404 });
   }
 
   // Filename logic (same as Laravel)
@@ -76,9 +83,15 @@ export async function GET(req: NextRequest) {
   const s3Response = await s3Client.send(command);
 
   const headers = new Headers();
-  headers.set("Content-Type", s3Response.ContentType || "application/octet-stream");
+  headers.set(
+    "Content-Type",
+    s3Response.ContentType || "application/octet-stream",
+  );
   headers.set("Content-Length", String(s3Response.ContentLength) || "");
-  headers.set("Content-Disposition", `attachment; filename="${encodeURIComponent(filename ?? '')}"`);
+  headers.set(
+    "Content-Disposition",
+    `attachment; filename="${encodeURIComponent(filename ?? "")}"`,
+  );
 
   const chunks: Uint8Array[] = [];
   for await (const chunk of s3Response.Body as any) {

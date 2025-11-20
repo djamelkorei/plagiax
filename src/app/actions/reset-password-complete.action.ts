@@ -1,37 +1,38 @@
 "use server";
 
-import {prisma} from "@/prisma";
-import {PasswordResetCompleteFormSchema} from "@/lib/form.service";
 import bcrypt from "bcryptjs";
+import { PasswordResetCompleteFormSchema } from "@/lib/form.service";
+import { prisma } from "@/prisma";
 
-export async function resetPasswordCompleteAction(formData: FormData): Promise<{ hasError: boolean, message: string }> {
-
+export async function resetPasswordCompleteAction(
+  formData: FormData,
+): Promise<{ hasError: boolean; message: string }> {
   const body = Object.fromEntries(formData);
   const parsed = PasswordResetCompleteFormSchema.safeParse(body);
 
-  if (!parsed.success) return {hasError: true, message: "Invalid input"};
+  if (!parsed.success) return { hasError: true, message: "Invalid input" };
 
   const passwordResetToken = await prisma.password_reset_tokens.findFirst({
     where: {
-      email: parsed.data.email
-    }
+      email: parsed.data.email,
+    },
   });
 
   if (!passwordResetToken) {
-    return {hasError: true, message: "Invalid token"};
+    return { hasError: true, message: "Invalid token" };
   }
 
   const tokenExpiredIn = 30 * 60 * 1000;
   const createdAt = new Date(passwordResetToken?.created_at!).getTime();
 
-  if ((Date.now() - createdAt) > tokenExpiredIn) {
-    return {hasError: true, message: "Expired token"};
+  if (Date.now() - createdAt > tokenExpiredIn) {
+    return { hasError: true, message: "Expired token" };
   }
 
   const user = await prisma.users.findUnique({
     where: {
-      email: parsed.data.email
-    }
+      email: parsed.data.email,
+    },
   });
 
   if (user) {
@@ -57,6 +58,6 @@ export async function resetPasswordCompleteAction(formData: FormData): Promise<{
 
   return {
     hasError: false,
-    message: 'success'
-  }
+    message: "success",
+  };
 }

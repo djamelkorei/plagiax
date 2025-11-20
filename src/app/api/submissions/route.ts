@@ -1,18 +1,18 @@
-import {NextResponse} from "next/server";
-import {getServerUser} from "@/lib/auth.service";
-import {prisma} from "@/prisma";
-import {SubmissionDto} from "@/dto/submission.dto";
-import {Pageable} from "@/dto/pageable.dto";
+import { NextResponse } from "next/server";
+import type { Pageable } from "@/dto/pageable.dto";
+import type { SubmissionDto } from "@/dto/submission.dto";
+import { getServerUser } from "@/lib/auth.service";
+import { prisma } from "@/prisma";
 
 export async function GET(req: Request) {
   try {
     const authUser = await getServerUser();
 
     if (!authUser) {
-      return NextResponse.json({message: "Unauthorized"}, {status: 401});
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const {searchParams} = new URL(req.url);
+    const { searchParams } = new URL(req.url);
 
     const q = searchParams.get("q") ?? "";
     const page = Number(searchParams.get("page") ?? "1");
@@ -54,7 +54,7 @@ export async function GET(req: Request) {
         )
       order by s.posted_at desc
       limit ${pageSize} offset ${offset}
-    `;
+     `;
 
     const totalCount = await prisma.$queryRaw<{ count: bigint }[]>`
       select cast(count(*) as signed) as count
@@ -67,7 +67,7 @@ export async function GET(req: Request) {
     const count = Number(totalCount[0]?.count ?? 0);
 
     const pageable: Pageable<SubmissionDto> = {
-      data: submissionList.map(s => ({
+      data: submissionList.map((s) => ({
         ...s,
         id: Number(s.id),
         similarity: Number(s.similarity),
@@ -77,12 +77,12 @@ export async function GET(req: Request) {
         page,
         pageSize,
         total: count,
-        totalPages: Math.ceil(count / pageSize)
-      }
-    }
+        totalPages: Math.ceil(count / pageSize),
+      },
+    };
     return NextResponse.json(pageable);
   } catch (err) {
     console.error(err);
-    return NextResponse.json({message: "Server error"}, {status: 500});
+    return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }

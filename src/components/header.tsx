@@ -124,8 +124,17 @@ export const Header = () => {
 
 
 const NavLink = ({text, href}: { text: string, href: string }) => {
+
+  const path = usePathname();
+  const isActive = path === href;
   return (
-    <Text transition={'all 0.2s ease'} color={'gray.500'} _hover={{color: 'black'}} fontSize={'0.875rem'}>
+    <Text transition={'all 0.2s ease'}
+          color={isActive ? 'black' : 'gray.500'}
+          _hover={{color: 'black'}}
+          fontSize={'0.875rem'}
+          borderBottom={'1px solid'}
+          borderBottomColor={isActive ? 'black' : 'transparent'}
+    >
       <Link href={href}>
         {text}
       </Link>

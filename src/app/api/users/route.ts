@@ -1,18 +1,18 @@
-import {NextResponse} from "next/server";
-import {getServerUser} from "@/lib/auth.service";
-import {prisma} from "@/prisma";
-import {Pageable} from "@/dto/pageable.dto";
-import {UserDTO} from "@/dto/user.dto";
+import { NextResponse } from "next/server";
+import type { Pageable } from "@/dto/pageable.dto";
+import type { UserDTO } from "@/dto/user.dto";
+import { getServerUser } from "@/lib/auth.service";
+import { prisma } from "@/prisma";
 
 export async function GET(req: Request) {
   try {
     const authUser = await getServerUser();
 
     if (!authUser || !authUser.is_instructor) {
-      return NextResponse.json({message: "Unauthorized"}, {status: 401});
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const {searchParams} = new URL(req.url);
+    const { searchParams } = new URL(req.url);
 
     const q = Number(searchParams.get("q") ?? "");
     const page = Number(searchParams.get("page") ?? "1");
@@ -49,21 +49,21 @@ export async function GET(req: Request) {
     const count = Number(totalCount[0]?.count ?? 0);
 
     const pageable: Pageable<UserDTO> = {
-      data: submissionList.map(s => ({
+      data: submissionList.map((s) => ({
         ...s,
         id: Number(s.id),
-          active: Number(s.active) === 1
+        active: Number(s.active) === 1,
       })),
       pagination: {
         page,
         pageSize,
         total: count,
-        totalPages: Math.ceil(count / pageSize)
-      }
-    }
+        totalPages: Math.ceil(count / pageSize),
+      },
+    };
     return NextResponse.json(pageable);
   } catch (err) {
     console.error(err);
-    return NextResponse.json({message: "Server error"}, {status: 500});
+    return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }

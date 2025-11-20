@@ -1,16 +1,21 @@
-import type {Metadata} from "next";
-import {Provider} from "@/components/ui/provider"
-import {Geist, Geist_Mono} from "next/font/google";
-
-import {Box, Container, Flex, Link as ChakraLink, Text} from "@chakra-ui/react"
-import {Logo} from "@/components/logo";
-import {AppContext} from "@/data/context";
+import {
+  Box,
+  Link as ChakraLink,
+  Container,
+  Flex,
+  Text,
+} from "@chakra-ui/react";
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
-import {ReactNode} from "react";
-import {Header} from "@/components/header";
-import {Toaster} from "@/components/ui/toaster";
-import {AuthContext} from "@/components/auth-context";
-import {TopProgress} from "@/components/top-progress";
+import { type ReactNode, Suspense } from "react";
+import { AuthContext } from "@/components/auth-context";
+import { Header } from "@/components/header";
+import { Logo } from "@/components/logo";
+import { TopProgress } from "@/components/top-progress";
+import { Provider } from "@/components/ui/provider";
+import { Toaster } from "@/components/ui/toaster";
+import { AppContext } from "@/data/context";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,81 +30,77 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: AppContext.name,
   description: "Plagiarism Detection Made Easy",
-  keywords: "plagiarism detection, plagiarism checker, originality, content checker",
+  keywords:
+    "plagiarism detection, plagiarism checker, originality, content checker",
   openGraph: {
     title: `${AppContext.name} | Plagiarism Detection Made Easy`,
     description: `${AppContext.name} helps you easily detect plagiarism and ensure your content is original and error-free.`,
     url: AppContext.url,
-    images: `${AppContext.url}/og-image.jpg`
+    images: `${AppContext.url}/og-image.jpg`,
   },
   twitter: {
     card: "summary_large_image",
     title: `${AppContext.name} | Plagiarism Detection Made Easy`,
     description: `${AppContext.name} helps you easily detect plagiarism and ensure your content is original and error-free.`,
-    images: `${AppContext.url}/og-image.jpg`
+    images: `${AppContext.url}/og-image.jpg`,
   },
 };
 
-export default function RootLayout({children,}: Readonly<{ children: ReactNode }>) {
-
+export default function RootLayout({
+  children,
+}: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-    <body className={`${geistSans.variable} ${geistMono.variable} `}>
-    <Provider>
+      <body className={`${geistSans.variable} ${geistMono.variable} `}>
+        <Provider>
+          <Flex direction="column" h="full" w={"full"} gap={6}>
+            <Suspense>
+              <TopProgress />
+            </Suspense>
 
+            {/*Navbar*/}
+            <Header />
 
-      <Flex direction="column" h="full" w={'full'} gap={6}>
+            <Container px={{ base: 8, lg: 40 }}>{children}</Container>
 
-        <TopProgress/>
+            <Toaster />
 
-        {/*Navbar*/}
-        <Header/>
+            <AuthContext />
 
-        <Container px={{base: 8, lg: 40}}>
-          {children}
-        </Container>
+            {/*Footer*/}
+            <Box borderTop={"1px solid"} borderColor={"border"}>
+              <Container px={{ base: 8, lg: 40 }}>
+                <Flex
+                  paddingY={6}
+                  paddingX={{ base: 0, md: 0 }}
+                  gap={6}
+                  alignItems={"center"}
+                  justifyContent={"space-between"}
+                  flexWrap={"wrap"}
+                >
+                  <Link href={"/"}>
+                    <Logo />
+                  </Link>
 
-        <Toaster/>
+                  <Flex gap={4} textStyle={"sm"}>
+                    <ChakraLink variant={"underline"} asChild>
+                      <Link href={"/terms"}>Terms of Use</Link>
+                    </ChakraLink>
+                    <ChakraLink variant={"underline"} asChild>
+                      <Link href={"/privacy"}>Privacy</Link>
+                    </ChakraLink>
+                  </Flex>
 
-        <AuthContext/>
-
-        {/*Footer*/}
-        <Box
-          borderTop={'1px solid'}
-          borderColor={'border'}
-        >
-          <Container px={{base: 8, lg: 40}}>
-            <Flex paddingY={6}
-                  paddingX={{base: 0, md: 0}} gap={6}
-                  alignItems={'center'}
-                  justifyContent={'space-between'}
-
-                  flexWrap={'wrap'}
-            >
-              <Link href={'/'}>
-                <Logo/>
-              </Link>
-
-              <Flex gap={4} textStyle={'sm'}>
-                <ChakraLink variant={'underline'} asChild>
-                  <Link href={'/terms'}>Terms of Use</Link>
-                </ChakraLink>
-                <ChakraLink variant={'underline'} asChild>
-                  <Link href={'/privacy'}>Privacy</Link>
-                </ChakraLink>
-              </Flex>
-
-              <Text textStyle={'sm'}>
-                © {new Date().getFullYear()} {AppContext.name}. All rights reserved
-              </Text>
-
-            </Flex>
-          </Container>
-        </Box>
-
-      </Flex>
-    </Provider>
-    </body>
+                  <Text textStyle={"sm"}>
+                    © {new Date().getFullYear()} {AppContext.name}. All rights
+                    reserved
+                  </Text>
+                </Flex>
+              </Container>
+            </Box>
+          </Flex>
+        </Provider>
+      </body>
     </html>
   );
 }

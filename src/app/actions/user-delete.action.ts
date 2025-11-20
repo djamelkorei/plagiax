@@ -1,21 +1,19 @@
 "use server";
 
-import {prisma} from "@/prisma";
-import {getServerUser} from "@/lib/auth.service";
+import { getServerUser } from "@/lib/auth.service";
+import { prisma } from "@/prisma";
 
 export async function userDeleteAction(formData: FormData) {
-
-  const userId = Number(formData.get('userId') ?? 0);
+  const userId = Number(formData.get("userId") ?? 0);
   if (!userId) {
-    return
+    return;
   }
   const auth = await getServerUser();
   if (!auth || !auth.is_instructor) {
-    return
+    return;
   }
 
   try {
-
     const result = await prisma.$executeRaw`
       update users
       set deleted_at     = now(),
@@ -31,6 +29,6 @@ export async function userDeleteAction(formData: FormData) {
 
     return result > 0;
   } catch (error) {
-    console.log(`Error deleting user with id: ${userId}`)
+    console.log(`Error deleting user with id: ${userId}`);
   }
 }

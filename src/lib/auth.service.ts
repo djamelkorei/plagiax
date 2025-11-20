@@ -1,9 +1,9 @@
-import jwt from "jsonwebtoken";
-import {cookies} from "next/headers";
-import {prisma} from "@/prisma";
-import {AuthDto} from "@/dto/user.dto";
-import crypto from "crypto";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
+import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
+import type { AuthDto } from "@/dto/user.dto";
+import { prisma } from "@/prisma";
 
 export type JwtPayload = {
   id: string;
@@ -37,7 +37,7 @@ export async function getServerUser(): Promise<AuthDto | null> {
            coalesce(u.membership_started_at, ins.membership_started_at)       as membership_started_at,
            coalesce(u.membership_ended_at, ins.membership_ended_at)           as membership_ended_at,
            coalesce(u.membership_ended_at, ins.membership_ended_at) >=
-           curdate()                                                          as is_membership_active,
+            curdate()                                                          as is_membership_active,
            if(coalesce(u.membership_started_at, ins.membership_started_at) <= curdate()
                 and coalesce(u.membership_ended_at, ins.membership_ended_at) >= curdate(),
               greatest(ceil(datediff(coalesce(u.membership_ended_at, ins.membership_ended_at), curdate())), 0),
@@ -68,8 +68,8 @@ export async function getServerUser(): Promise<AuthDto | null> {
       submission_count: Number(authUser[0].submission_count),
       membership_days_left: Number(authUser[0].membership_days_left),
       is_membership_active: Number(authUser[0].is_membership_active) > 0,
-      is_instructor: Number(authUser[0].is_instructor) > 0
-    }
+      is_instructor: Number(authUser[0].is_instructor) > 0,
+    };
   }
   return null;
 }
@@ -79,7 +79,7 @@ export async function generateAuthResetLink(email: string) {
   const hashedToken = await bcrypt.hash(plainToken, 10);
 
   await prisma.password_reset_tokens.deleteMany({
-    where: {email},
+    where: { email },
   });
 
   await prisma.password_reset_tokens.create({

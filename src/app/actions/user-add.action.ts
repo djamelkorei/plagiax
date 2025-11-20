@@ -1,29 +1,32 @@
 "use server";
 
-import {prisma} from "@/prisma";
-import {getServerUser} from "@/lib/auth.service";
-import {AddUserFormSchema} from "@/lib/form.service";
 import bcrypt from "bcryptjs";
-import {MailService} from "@/lib/mail.service";
+import { getServerUser } from "@/lib/auth.service";
+import { AddUserFormSchema } from "@/lib/form.service";
+import { MailService } from "@/lib/mail.service";
+import { prisma } from "@/prisma";
 
-export async function userAddAction(formData: FormData): Promise<{ hasError: boolean, message: string }> {
-
+export async function userAddAction(
+  formData: FormData,
+): Promise<{ hasError: boolean; message: string }> {
   const authUser = await getServerUser();
   if (!authUser || !authUser.is_instructor) {
-    return {hasError: true, message: "Unauthorized"};
+    return { hasError: true, message: "Unauthorized" };
   }
 
   if (!authUser.is_membership_active) {
     return {
       hasError: true,
-      message: "You consume all your daily quota for today, come back tomorrow or upgrade your plan"
+      message:
+        "You consume all your daily quota for today, come back tomorrow or upgrade your plan",
     };
   }
 
   if (authUser.student_count + 1 > authUser.membership_student_count) {
     return {
       hasError: true,
-      message: "Total quota exceeded, contact us so we can upgrade your membership"
+      message:
+        "Total quota exceeded, contact us so we can upgrade your membership",
     };
   }
 
@@ -31,46 +34,42 @@ export async function userAddAction(formData: FormData): Promise<{ hasError: boo
   const parsed = AddUserFormSchema.safeParse({
     ...body,
     id: Number.isSafeInteger(body.id) ? Number(body.id) : 0,
-    active: body.active === 'true',
+    active: body.active === "true",
   });
 
-  if (!parsed.success) return {hasError: true, message: "Invalid input"};
+  if (!parsed.success) return { hasError: true, message: "Invalid input" };
 
   const exists = await prisma.users.findUnique({
     where: {
       email: parsed.data.email,
-      ...(parsed.data.id ? {NOT: {id: parsed.data.id}} : {})
+      ...(parsed.data.id ? { NOT: { id: parsed.data.id } } : {}),
     },
   });
 
   if (exists) {
     return {
       hasError: true,
-      message: 'Email already been used '
-    }
+      message: "Email already been used ",
+    };
   }
 
   try {
-
-
     const now = new Date();
 
     if (parsed.data.id) {
-
       await prisma.users.update({
         data: {
           name: parsed.data.name,
           email: parsed.data.email,
           active: parsed.data.active,
-          updated_at: now
+          updated_at: now,
         },
         where: {
           id: parsed.data.id,
-          instructor_id: authUser.id
-        }
+          instructor_id: authUser.id,
+        },
       });
     } else {
-
       const passwordHash = await bcrypt.hash(parsed.data.password, 7);
 
       const user = await prisma.users.create({
@@ -82,38 +81,40 @@ export async function userAddAction(formData: FormData): Promise<{ hasError: boo
           ai_enabled: Boolean(authUser.ai_enabled),
           active: true,
           created_at: now,
-          updated_at: now
+          updated_at: now,
         },
       });
 
       const role = await prisma.roles.findFirst({
         where: {
-          name: 'student'
-        }
+          name: "student",
+        },
       });
 
       await prisma.model_has_roles.create({
         data: {
           role_id: role!.id,
           model_id: user.id,
-          model_type: 'App\\Models\\User'
-        }
-      })
+          model_type: "App\\Models\\User",
+        },
+      });
 
       if (user) {
         const link = `${process.env.APP_URL}/login`;
-        await MailService.sendWelcomeEmail(user.name, user.email!, link, parsed.data.password);
+        await MailService.sendWelcomeEmail(
+          user.name,
+          user.email!,
+          link,
+          parsed.data.password,
+        );
       }
-
     }
-
-
   } catch (error) {
     console.error(`Exception in writeFile() with error`, error);
   }
 
   return {
     hasError: false,
-    message: 'success'
-  }
+    message: "success",
+  };
 }

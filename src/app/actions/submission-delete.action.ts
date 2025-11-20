@@ -1,21 +1,19 @@
 "use server";
 
-import {prisma} from "@/prisma";
-import {getServerUser} from "@/lib/auth.service";
+import { getServerUser } from "@/lib/auth.service";
+import { prisma } from "@/prisma";
 
 export async function submissionDeleteAction(formData: FormData) {
-
-  const submissionId = Number(formData.get('submissionId') ?? 0);
+  const submissionId = Number(formData.get("submissionId") ?? 0);
   if (!submissionId) {
-    return
+    return;
   }
   const auth = await getServerUser();
   if (!auth) {
-    return
+    return;
   }
 
   try {
-
     const result = await prisma.$executeRaw`
       update submissions s
       set status     = 'DELETED',
@@ -33,6 +31,6 @@ export async function submissionDeleteAction(formData: FormData) {
 
     return result > 0;
   } catch (error) {
-    console.log(`Error deleting submission with id: ${submissionId}`)
+    console.log(`Error deleting submission with id: ${submissionId}`);
   }
 }

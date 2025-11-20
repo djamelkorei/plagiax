@@ -1,6 +1,6 @@
 "use server";
 
-import {cookies} from "next/headers";
+import { cookies } from "next/headers";
 
 export async function logoutAction() {
   (await cookies()).set("auth_token", "", {
