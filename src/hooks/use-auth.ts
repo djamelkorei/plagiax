@@ -1,21 +1,21 @@
-import {create} from 'zustand'
+import { create } from "zustand";
 import Cookies from "js-cookie";
-import {ClientService} from "@/lib/client.service";
-import {AuthDto} from "@/dto/user.dto";
+import { ClientService } from "@/lib/client.service";
+import { AuthDto } from "@/dto/user.dto";
 
 interface AuthState {
-  auth: AuthDto
-  isAuthenticated: boolean
-  setAuth: (auth: AuthDto) => void
-  logout: () => void
-  loadUser: () => Promise<string>,
-  isAuthLoading: boolean
+  auth: AuthDto;
+  isAuthenticated: boolean;
+  setAuth: (auth: AuthDto) => void;
+  logout: () => void;
+  loadUser: () => Promise<string>;
+  isAuthLoading: boolean;
 }
 
 const anonymous: AuthDto = {
   id: 0,
-  name: '',
-  email: '',
+  name: "",
+  email: "",
   student_count: 0,
   submission_count: 0,
   membership_threshold: 0,
@@ -26,41 +26,40 @@ const anonymous: AuthDto = {
   membership_days_left: 0,
   is_membership_active: false,
   is_instructor: false,
-  ai_enabled: false
-}
+  ai_enabled: false,
+};
 
 export const useAuth = create<AuthState>((set) => ({
   auth: anonymous,
   isAuthenticated: false,
   isAuthLoading: true,
-  setAuth: (auth: AuthDto) => set({auth: auth}),
+  setAuth: (auth: AuthDto) => set({ auth: auth }),
   logout: () => {
-    set({auth: anonymous});
-    Cookies.remove('auth_token');
+    set({ auth: anonymous });
+    Cookies.remove("auth_token");
   },
   loadUser: async () => {
-    set({isAuthLoading: true});
+    set({ isAuthLoading: true });
     try {
-
       const response = await ClientService.api.auth.me();
 
       if (!response.hasError) {
-        console.info('Success to load user:', useAuth)
+        console.info("Success to load user:", useAuth);
         set({
           isAuthenticated: true,
           isAuthLoading: false,
-          auth: {...response.data}
+          auth: { ...response.data },
         });
-        return response.data.is_instructor ? 'instructor' : 'student'
+        return response.data.is_instructor ? "instructor" : "student";
       }
     } catch (error) {
-      console.error('Failed to load user:', error)
+      console.error("Failed to load user:", error);
     }
     set({
       isAuthenticated: false,
       isAuthLoading: false,
-      auth: anonymous
-    })
-    return ''
+      auth: anonymous,
+    });
+    return "";
   },
-}))
+}));

@@ -1,6 +1,5 @@
-import {defineSlotRecipe} from "@chakra-ui/react";
-import {progressAnatomy} from "@ark-ui/react";
-
+import { defineSlotRecipe } from "@chakra-ui/react";
+import { progressAnatomy } from "@ark-ui/react";
 
 export const progressSlotRecipe = defineSlotRecipe({
   slots: progressAnatomy.keys(),
@@ -50,7 +49,7 @@ export const progressSlotRecipe = defineSlotRecipe({
         track: {
           shadow: "inset",
           bgColor: "transparent",
-          border: 0
+          border: 0,
         },
         range: {
           bgColor: "colorPalette.solid",
@@ -127,4 +126,4 @@ export const progressSlotRecipe = defineSlotRecipe({
     size: "md",
     shape: "rounded",
   },
-})
+});

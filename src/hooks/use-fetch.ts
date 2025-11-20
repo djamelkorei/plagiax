@@ -1,11 +1,11 @@
-'use client'
+"use client";
 
-import {useCallback, useEffect, useMemo, useState} from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 export function useFetch<T>(
   url: string,
   params?: Record<string, string | number | boolean | null | undefined>,
-  options?: RequestInit
+  options?: RequestInit,
 ) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
@@ -62,5 +62,5 @@ export function useFetch<T>(
     };
   }, [finalUrl, trigger, options]);
 
-  return {data, loading, error, refetch};
+  return { data, loading, error, refetch };
 }

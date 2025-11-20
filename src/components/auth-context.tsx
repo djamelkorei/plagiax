@@ -1,18 +1,16 @@
-'use client';
+"use client";
 
-import {useEffect} from "react";
-import {useAuth} from "@/hooks/use-auth";
+import { useEffect } from "react";
+import { useAuth } from "@/hooks/use-auth";
 
 export const AuthContext = () => {
-
-  const loadUser = useAuth((s) => s.loadUser)
+  const loadUser = useAuth((s) => s.loadUser);
 
   useEffect(() => {
     loadUser().then(() => {
-      console.log('loaded user')
+      console.log("loaded user");
     });
   }, []);
 
   return null;
-
-}
+};

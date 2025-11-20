@@ -1,22 +1,22 @@
-import {Icon, Input, InputGroup, InputProps} from "@chakra-ui/react";
-import {ChangeEvent, useEffect, useState} from "react";
-import {IoIosSearch} from "react-icons/io";
+import { Icon, Input, InputGroup, InputProps } from "@chakra-ui/react";
+import { ChangeEvent, useEffect, useState } from "react";
+import { IoIosSearch } from "react-icons/io";
 
 export const SearchFilter = ({
-                               loading,
-                               callback = () => {
-                               }, placeholder = 'search', ...rest
-                             }: {
-  loading: boolean,
-  callback: (value: string | null) => void,
-  placeholder: string
+  loading,
+  callback = () => {},
+  placeholder = "search",
+  ...rest
+}: {
+  loading: boolean;
+  callback: (value: string | null) => void;
+  placeholder: string;
 } & InputProps) => {
-
-  const [search, setSearch] = useState<string>('');
+  const [search, setSearch] = useState<string>("");
 
   const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
-  }
+  };
 
   useEffect(() => {
     if (!search.trim()) {
@@ -32,16 +32,16 @@ export const SearchFilter = ({
   }, [callback, search]);
 
   return (
-    <InputGroup endElement={<Icon w={4} h={4} as={IoIosSearch}/>}>
+    <InputGroup endElement={<Icon w={4} h={4} as={IoIosSearch} />}>
       <Input
         //disabled={loading}
         value={search}
-        type={'search'}
+        type={"search"}
         placeholder={placeholder}
-        colorPalette={'primary'}
+        colorPalette={"primary"}
         onChange={handleOnChange}
         {...rest}
       />
     </InputGroup>
-  )
-}
+  );
+};

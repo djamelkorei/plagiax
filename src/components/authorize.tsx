@@ -1,18 +1,18 @@
-import {useAuth} from "@/hooks/use-auth";
-import {ReactNode} from "react";
+import { useAuth } from "@/hooks/use-auth";
+import { ReactNode } from "react";
 
-
-export const Authorize = ({roles = [], children}: { roles: ('student' | 'instructor')[], children?: ReactNode }) => {
-
+export const Authorize = ({
+  roles = [],
+  children,
+}: {
+  roles: ("student" | "instructor")[];
+  children?: ReactNode;
+}) => {
   const auth = useAuth((s) => s.auth);
 
-  if (!roles.includes(auth.is_instructor ? 'instructor' : 'student')) {
-    return null
+  if (!roles.includes(auth.is_instructor ? "instructor" : "student")) {
+    return null;
   }
 
-  return (
-    <>
-      {children}
-    </>
-  )
-}
+  return <>{children}</>;
+};

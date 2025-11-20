@@ -40,8 +40,8 @@ export async function GET(req: NextRequest) {
 
   if (
     !submissionUser ||
-    (Number(submissionUser.id) != auth.id &&
-      Number(submissionUser.instructor_id) != auth.id)
+    (Number(submissionUser.id) !== auth.id &&
+      Number(submissionUser.instructor_id) !== auth.id)
   ) {
     return NextResponse.json({ message: "Not Found" }, { status: 404 });
   }

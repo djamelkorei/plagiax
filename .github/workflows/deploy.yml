@@ -17,5 +17,6 @@ jobs:
             git reset --hard HEAD
             git pull
             npm install
+            npm run prisma
             npm run build
             pm2 restart ecosystem.config.js --env production

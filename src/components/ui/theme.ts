@@ -1,6 +1,5 @@
-import {createSystem, defaultConfig, defineConfig} from "@chakra-ui/react";
-import {progressSlotRecipe} from "@/components/ui/recipes/progress.recipe";
-
+import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react";
+import { progressSlotRecipe } from "@/components/ui/recipes/progress.recipe";
 
 // const brandColor = "#38dfdb"
 // const secondaryColor = "#121820"
@@ -23,26 +22,25 @@ import {progressSlotRecipe} from "@/components/ui/recipes/progress.recipe";
 //   }
 // };
 
-
 const config = defineConfig({
   globalCss: {
     "html, body": {
       margin: 0,
       padding: 0,
     },
-    "body": {
-      position: 'relative',
-      fontFamily: "Geist, Geist Fallback"
+    body: {
+      position: "relative",
+      fontFamily: "Geist, Geist Fallback",
     },
-    "a": {
-      outline: "none !important"
+    a: {
+      outline: "none !important",
     },
     ".cm-editor": {
       fontFamily: "'Fira Code', monospace !important",
     },
     ".font-logo": {
-      fontFamily: "Geist Mono, Geist Mono Fallback"
-    }
+      fontFamily: "Geist Mono, Geist Mono Fallback",
+    },
   },
   theme: {
     recipes: {
@@ -58,7 +56,7 @@ const config = defineConfig({
       //   menu: menuSlotRecipe,
       //   radioCard: radioCardSlotRecipe,
       //   switch: switchSlotRecipe,
-      progress: progressSlotRecipe
+      progress: progressSlotRecipe,
     },
     // tokens: {
     //   colors: {
@@ -133,6 +131,6 @@ const config = defineConfig({
     //   },
     // },
   },
-})
+});
 
-export const system = createSystem(defaultConfig, config)
+export const system = createSystem(defaultConfig, config);

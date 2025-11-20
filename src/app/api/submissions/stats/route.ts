@@ -25,7 +25,7 @@ export async function GET() {
     `;
 
     return NextResponse.json(
-      submissionStatsLines.map((line) => {
+      submissionStatsLines.map((line: SubmissionStatsDto) => {
         return {
           month: Number(line.month),
           year: Number(line.year),

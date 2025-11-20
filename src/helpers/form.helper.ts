@@ -6,5 +6,5 @@ export const FormHelper = {
       formData.append(key, value);
     });
     return formData;
-  }
-}
+  },
+};

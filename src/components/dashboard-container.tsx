@@ -1,83 +1,87 @@
-'use client'
+"use client";
 
-import React, {Activity, ReactNode} from "react";
-import {Badge, Box, Button, Flex, Skeleton, Text} from "@chakra-ui/react";
-import {HiOutlineHome, HiOutlineMail} from "react-icons/hi";
-import {usePathname} from "next/navigation";
-import {useAuth} from "@/hooks/use-auth";
+import React, { Activity, ReactNode } from "react";
+import { Badge, Box, Button, Flex, Skeleton, Text } from "@chakra-ui/react";
+import { HiOutlineHome, HiOutlineMail } from "react-icons/hi";
+import { usePathname } from "next/navigation";
+import { useAuth } from "@/hooks/use-auth";
 
 interface DashboardContainerProps {
-  title: string,
-  children?: ReactNode,
-  breadcrumbs: string[]
+  title: string;
+  children?: ReactNode;
+  breadcrumbs: string[];
 }
 
 export const DashboardContainer = (props: DashboardContainerProps) => {
-
   const pathname = usePathname();
-  const isDashboardHome = pathname === '/dashboard';
+  const isDashboardHome = pathname === "/dashboard";
 
   return (
-    <Flex flexDirection={'column'}>
-      <Flex gap={3}
-            borderBottom={'1px solid'}
-            borderColor={'border'}
-            pb={4}
-            alignItems={'center'}
+    <Flex flexDirection={"column"}>
+      <Flex
+        gap={3}
+        borderBottom={"1px solid"}
+        borderColor={"border"}
+        pb={4}
+        alignItems={"center"}
       >
-        <HiOutlineHome/>
-
+        <HiOutlineHome />
 
         {props.breadcrumbs.map((item) => (
           <React.Fragment key={item}>
-            <Text fontWeight={'semibold'} textStyle={'2xs'}>/</Text>
+            <Text fontWeight={"semibold"} textStyle={"2xs"}>
+              /
+            </Text>
             {item}
           </React.Fragment>
         ))}
-
       </Flex>
 
-      <Activity mode={isDashboardHome ? 'hidden' : 'visible'}>
-        <MembershipBar/>
+      <Activity mode={isDashboardHome ? "hidden" : "visible"}>
+        <MembershipBar />
       </Activity>
 
-
-      <Box minH={{base: 'full', md: 'calc(100vh - 250px)'}} py={6}>
+      <Box minH={{ base: "full", md: "calc(100vh - 250px)" }} py={6}>
         {props.children}
       </Box>
     </Flex>
-  )
-}
-
+  );
+};
 
 export const MembershipBar = () => {
-
-  const auth = useAuth((s) => s.auth)
-  const isAuthLoading = useAuth((s) => s.isAuthLoading)
+  const auth = useAuth((s) => s.auth);
+  const isAuthLoading = useAuth((s) => s.isAuthLoading);
 
   return (
-    <Flex gap={6}
-          borderBottom={'1px solid'}
-          borderColor={'border'}
-          py={4}
-          alignItems={'center'}
-          flexDirection={{base: 'column', md: 'row'}}
+    <Flex
+      gap={6}
+      borderBottom={"1px solid"}
+      borderColor={"border"}
+      py={4}
+      alignItems={"center"}
+      flexDirection={{ base: "column", md: "row" }}
     >
-      <Flex gap={2} alignItems={'center'}>
-        <Text textStyle={'sm'} fontWeight={'semibold'}>Membership</Text>
+      <Flex gap={2} alignItems={"center"}>
+        <Text textStyle={"sm"} fontWeight={"semibold"}>
+          Membership
+        </Text>
         <Skeleton loading={isAuthLoading}>
-          <Badge colorPalette={auth.is_membership_active ? 'teal' : 'red'}>
-            {auth.is_membership_active ? 'Active' : 'Inactive'}
+          <Badge colorPalette={auth.is_membership_active ? "teal" : "red"}>
+            {auth.is_membership_active ? "Active" : "Inactive"}
           </Badge>
         </Skeleton>
       </Flex>
 
-      <Text color={'gray.300'} display={{base: 'none', md: 'block'}}>|</Text>
+      <Text color={"gray.300"} display={{ base: "none", md: "block" }}>
+        |
+      </Text>
 
-      <Flex gap={2} alignItems={'center'}>
-        <Text textStyle={'sm'} fontWeight={'semibold'}>Days Left</Text>
+      <Flex gap={2} alignItems={"center"}>
+        <Text textStyle={"sm"} fontWeight={"semibold"}>
+          Days Left
+        </Text>
         <Skeleton loading={isAuthLoading}>
-          <Badge colorPalette={auth.is_membership_active ? 'teal' : 'red'}>
+          <Badge colorPalette={auth.is_membership_active ? "teal" : "red"}>
             {auth.membership_days_left} days
           </Badge>
         </Skeleton>
@@ -85,31 +89,37 @@ export const MembershipBar = () => {
 
       {auth.is_instructor && (
         <>
-          <Text color={'gray.300'} display={{base: 'none', md: 'block'}}>|</Text>
+          <Text color={"gray.300"} display={{ base: "none", md: "block" }}>
+            |
+          </Text>
 
-          <Flex gap={2} alignItems={'center'}>
-            <Text textStyle={'sm'} fontWeight={'semibold'}>Student Accounts</Text>
+          <Flex gap={2} alignItems={"center"}>
+            <Text textStyle={"sm"} fontWeight={"semibold"}>
+              Student Accounts
+            </Text>
             <Badge
-              colorPalette={auth.is_membership_active
-                ? (auth.student_count === auth.membership_student_count ? 'orange' : 'teal')
-                : 'red'}>
-              {auth.student_count}/{auth.membership_student_count.toLocaleString()}
+              colorPalette={
+                auth.is_membership_active
+                  ? auth.student_count === auth.membership_student_count
+                    ? "orange"
+                    : "teal"
+                  : "red"
+              }
+            >
+              {auth.student_count}/
+              {auth.membership_student_count.toLocaleString()}
             </Badge>
           </Flex>
         </>
       )}
 
-      <Flex alignItems={'center'} gap={2} ms={{base: 'inherit', md: 'auto'}}>
-
+      <Flex alignItems={"center"} gap={2} ms={{ base: "inherit", md: "auto" }}>
         Need help ?
-
-        <Button size={'xs'} ms={'auto'}>
+        <Button size={"xs"} ms={"auto"}>
           Contact Us
-          <HiOutlineMail/>
+          <HiOutlineMail />
         </Button>
-
       </Flex>
-
     </Flex>
-  )
-}
+  );
+};

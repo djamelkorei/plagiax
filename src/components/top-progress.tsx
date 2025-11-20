@@ -1,8 +1,8 @@
 "use client";
 
-import {Progress} from "@chakra-ui/react";
-import {useEffect, useState} from "react";
-import {usePathname, useSearchParams} from "next/navigation";
+import { Progress } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 
 export const TopProgress = () => {
   const pathname = usePathname();
@@ -47,8 +47,13 @@ export const TopProgress = () => {
       variant="subtle"
     >
       <Progress.Track
-        style={{borderRadius: '0 !important', border: '0 !important', background: 'transparent !important'}}>
-        <Progress.Range/>
+        style={{
+          borderRadius: "0 !important",
+          border: "0 !important",
+          background: "transparent !important",
+        }}
+      >
+        <Progress.Range />
       </Progress.Track>
     </Progress.Root>
   );

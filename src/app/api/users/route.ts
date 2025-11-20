@@ -49,7 +49,7 @@ export async function GET(req: Request) {
     const count = Number(totalCount[0]?.count ?? 0);
 
     const pageable: Pageable<UserDTO> = {
-      data: submissionList.map((s) => ({
+      data: submissionList.map((s: UserDTO) => ({
         ...s,
         id: Number(s.id),
         active: Number(s.active) === 1,
