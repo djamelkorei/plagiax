@@ -54,7 +54,7 @@ export async function GET(req: Request) {
         )
       order by s.posted_at desc
       limit ${pageSize} offset ${offset}
-     `;
+    `;
 
     const totalCount = await prisma.$queryRaw<{ count: bigint }[]>`
       select cast(count(*) as signed) as count
@@ -67,7 +67,7 @@ export async function GET(req: Request) {
     const count = Number(totalCount[0]?.count ?? 0);
 
     const pageable: Pageable<SubmissionDto> = {
-      data: submissionList.map((s) => ({
+      data: submissionList.map((s: SubmissionDto) => ({
         ...s,
         id: Number(s.id),
         similarity: Number(s.similarity),
