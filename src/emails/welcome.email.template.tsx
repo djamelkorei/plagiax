@@ -1,6 +1,6 @@
-import TemplateEmail from "@/emails/lib/template.email";
-import { ButtonEmail } from "@/emails/lib/button.email";
 import { AppContext } from "@/data/context";
+import { ButtonEmail } from "@/emails/lib/button.email";
+import TemplateEmail from "@/emails/lib/template.email";
 import { TextEmail } from "@/emails/lib/text.email";
 
 interface EmailVerificationProps {

@@ -1,4 +1,4 @@
-import { Button, ButtonProps } from "@react-email/components";
+import { Button, type ButtonProps } from "@react-email/components";
 
 export const ButtonEmail = (props: ButtonProps) => {
   return (

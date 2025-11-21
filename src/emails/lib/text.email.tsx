@@ -1,4 +1,4 @@
-import { Text, TextProps } from "@react-email/components";
+import { Text, type TextProps } from "@react-email/components";
 
 export const TextEmail = (props: TextProps) => {
   return (

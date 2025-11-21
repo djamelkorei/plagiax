@@ -1,4 +1,3 @@
-import { Dispatch, SetStateAction, useEffect } from "react";
 import {
   Button,
   CloseButton,
@@ -11,14 +10,15 @@ import {
   Stack,
   Switch,
 } from "@chakra-ui/react";
-import { UserDTO } from "@/dto/user.dto";
-import { MdArrowRightAlt } from "react-icons/md";
-import { IoMdRefresh } from "react-icons/io";
-import { FormProvider, useForm, useWatch } from "react-hook-form";
-import { AddUserFormRequest, AddUserFormSchema } from "@/lib/form.service";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FormHelper } from "@/helpers/form.helper";
+import { type Dispatch, type SetStateAction, useEffect } from "react";
+import { FormProvider, useForm, useWatch } from "react-hook-form";
+import { IoMdRefresh } from "react-icons/io";
+import { MdArrowRightAlt } from "react-icons/md";
 import { userAddAction } from "@/app/actions/user-add.action";
+import type { UserDTO } from "@/dto/user.dto";
+import { FormHelper } from "@/helpers/form.helper";
+import { type AddUserFormRequest, AddUserFormSchema } from "@/lib/form.service";
 
 interface AddUserModalProps {
   selectedUser: UserDTO | null;

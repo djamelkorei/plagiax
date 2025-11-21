@@ -1,9 +1,11 @@
+import crypto from "node:crypto";
 import bcrypt from "bcryptjs";
-import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 import type { AuthDto } from "@/dto/user.dto";
 import { prisma } from "@/prisma";
+
+const JWT_SECRET = process.env.JWT_SECRET ?? "";
 
 export type JwtPayload = {
   id: string;
@@ -12,7 +14,7 @@ export type JwtPayload = {
 
 export function verifyToken(token: string) {
   try {
-    return jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+    return jwt.verify(token, JWT_SECRET) as JwtPayload;
   } catch {
     return null;
   }
@@ -30,14 +32,14 @@ export async function getServerUser(): Promise<AuthDto | null> {
            u.email,
            u.name,
            r.name = 'instructor'                                              as is_instructor,
-           coalesce(u.ai_enabled, ins.ai_enabled)                             as ai_enabled,
+           u.ai_enabled                                                       as ai_enabled,
            coalesce(u.membership_threshold, ins.membership_threshold)         as membership_threshold,
            coalesce(u.membership_length, ins.membership_length)               as membership_length,
            coalesce(u.membership_student_count, ins.membership_student_count) as membership_student_count,
            coalesce(u.membership_started_at, ins.membership_started_at)       as membership_started_at,
            coalesce(u.membership_ended_at, ins.membership_ended_at)           as membership_ended_at,
            coalesce(u.membership_ended_at, ins.membership_ended_at) >=
-            curdate()                                                          as is_membership_active,
+           curdate()                                                          as is_membership_active,
            if(coalesce(u.membership_started_at, ins.membership_started_at) <= curdate()
                 and coalesce(u.membership_ended_at, ins.membership_ended_at) >= curdate(),
               greatest(ceil(datediff(coalesce(u.membership_ended_at, ins.membership_ended_at), curdate())), 0),

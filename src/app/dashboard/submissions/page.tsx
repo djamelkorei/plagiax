@@ -508,7 +508,7 @@ const ReportStatus = ({
           <AiOutlinePercentage />
         </Badge>
       ) : submission.report_link ? (
-        <>{children}</>
+        children
       ) : (
         <span className="text-gray-400 text-sm italic">—</span>
       )}

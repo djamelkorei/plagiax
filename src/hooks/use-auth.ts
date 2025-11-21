@@ -1,7 +1,7 @@
-import { create } from "zustand";
 import Cookies from "js-cookie";
+import { create } from "zustand";
+import type { AuthDto } from "@/dto/user.dto";
 import { ClientService } from "@/lib/client.service";
-import { AuthDto } from "@/dto/user.dto";
 
 interface AuthState {
   auth: AuthDto;

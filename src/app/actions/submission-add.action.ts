@@ -1,20 +1,20 @@
 "use server";
 
+import crypto from "node:crypto";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import crypto from "crypto";
 import { getServerUser } from "@/lib/auth.service";
 import { AddSubmissionFormSchema } from "@/lib/form.service";
 import { prisma } from "@/prisma";
 
 // S3 config
 const s3Client = new S3Client({
-  region: process.env.AWS_DEFAULT_REGION!,
+  region: process.env.AWS_DEFAULT_REGION ?? "",
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID ?? "",
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? "",
   },
   bucketEndpoint: true,
-  forcePathStyle: process.env.AWS_S3_USE_PATH_STYLE_ENDPOINT! === "true",
+  forcePathStyle: process.env.AWS_S3_USE_PATH_STYLE_ENDPOINT === "true",
 });
 
 export async function submissionAddAction(

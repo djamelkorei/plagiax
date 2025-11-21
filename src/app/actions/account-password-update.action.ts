@@ -26,7 +26,7 @@ export async function accountPasswordUpdate(
 
   const match = await bcrypt.compare(
     parsed.data.current_password,
-    current!.password,
+    current?.password ?? "",
   );
   if (!match)
     return {

@@ -7,10 +7,10 @@ import {
   Text,
 } from "@react-email/components";
 import { Tailwind } from "@react-email/tailwind";
-import { tailwindConfig } from "@/emails/lib/tailwind.config";
-import { DividerEmail } from "@/emails/lib/divider.email";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { AppContext } from "@/data/context";
+import { DividerEmail } from "@/emails/lib/divider.email";
+import { tailwindConfig } from "@/emails/lib/tailwind.config";
 import { TextEmail } from "@/emails/lib/text.email";
 
 export default function TemplateEmail({
@@ -71,7 +71,7 @@ export default function TemplateEmail({
               If you require any assistance, don’t hesitate to reach out at :{" "}
               <a
                 className={"text-[#555] text-underline"}
-                href={"mailto:" + AppContext.email}
+                href={`mailto:${AppContext.email}`}
               >
                 {AppContext.email}
               </a>

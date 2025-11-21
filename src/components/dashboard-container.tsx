@@ -1,9 +1,9 @@
 "use client";
 
-import React, { Activity, ReactNode } from "react";
 import { Badge, Box, Button, Flex, Skeleton, Text } from "@chakra-ui/react";
-import { HiOutlineHome, HiOutlineMail } from "react-icons/hi";
 import { usePathname } from "next/navigation";
+import React, { Activity, type ReactNode } from "react";
+import { HiOutlineHome, HiOutlineMail } from "react-icons/hi";
 import { useAuth } from "@/hooks/use-auth";
 
 interface DashboardContainerProps {

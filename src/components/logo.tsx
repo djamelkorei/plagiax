@@ -1,4 +1,4 @@
-import { Text, TextProps } from "@chakra-ui/react";
+import { Text, type TextProps } from "@chakra-ui/react";
 
 export const Logo = (props: TextProps) => {
   return (

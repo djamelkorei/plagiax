@@ -1,5 +1,5 @@
+import type { ReactNode } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { ReactNode } from "react";
 
 export const Authorize = ({
   roles = [],

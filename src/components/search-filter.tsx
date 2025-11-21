@@ -1,5 +1,5 @@
-import { Icon, Input, InputGroup, InputProps } from "@chakra-ui/react";
-import { ChangeEvent, useEffect, useState } from "react";
+import { Icon, Input, InputGroup, type InputProps } from "@chakra-ui/react";
+import { type ChangeEvent, useEffect, useState } from "react";
 import { IoIosSearch } from "react-icons/io";
 
 export const SearchFilter = ({

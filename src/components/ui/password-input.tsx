@@ -12,8 +12,8 @@ import {
   IconButton,
   Input,
   InputGroup,
-  Stack,
   mergeRefs,
+  Stack,
   useControllableState,
 } from "@chakra-ui/react";
 import * as React from "react";
@@ -126,9 +126,9 @@ export const PasswordStrengthMeter = React.forwardRef<
   return (
     <Stack align="flex-end" gap="1" ref={ref} {...rest}>
       <HStack width="full" {...rest}>
-        {Array.from({ length: max }).map((_, index) => (
+        {Array.from({ length: max }, (_, i) => i).map((val, index) => (
           <Box
-            key={index}
+            key={`${val}`}
             height="1"
             flex="1"
             rounded="sm"

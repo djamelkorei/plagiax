@@ -91,9 +91,17 @@ export async function userAddAction(
         },
       });
 
+      if (!role) {
+        console.error(`role with name 'student' does not exits`);
+        return {
+          hasError: false,
+          message: "something went wrong",
+        };
+      }
+
       await prisma.model_has_roles.create({
         data: {
-          role_id: role!.id,
+          role_id: role.id,
           model_id: user.id,
           model_type: "App\\Models\\User",
         },
@@ -103,7 +111,7 @@ export async function userAddAction(
         const link = `${process.env.APP_URL}/login`;
         await MailService.sendWelcomeEmail(
           user.name,
-          user.email!,
+          user.email ?? "",
           link,
           parsed.data.password,
         );

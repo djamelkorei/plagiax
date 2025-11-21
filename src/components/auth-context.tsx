@@ -10,7 +10,7 @@ export const AuthContext = () => {
     loadUser().then(() => {
       console.log("loaded user");
     });
-  }, []);
+  }, [loadUser]);
 
   return null;
 };

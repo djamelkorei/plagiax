@@ -1,8 +1,10 @@
 export const FormHelper = {
-  toFormData: (data: any): FormData => {
+  toFormData: (data: {
+    [key: string]: number | string | boolean | number[] | string[] | boolean[];
+  }): FormData => {
     const formData = new FormData();
     Object.entries(data).forEach(([key, value]) => {
-      // @ts-ignore
+      // @ts-expect-error
       formData.append(key, value);
     });
     return formData;

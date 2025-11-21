@@ -31,6 +31,6 @@ export async function submissionDeleteAction(formData: FormData) {
 
     return result > 0;
   } catch (error) {
-    console.log(`Error deleting submission with id: ${submissionId}`);
+    console.log(`Error deleting submission with id: ${submissionId}`, error);
   }
 }

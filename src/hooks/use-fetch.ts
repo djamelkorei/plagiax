@@ -36,6 +36,7 @@ export function useFetch<T>(
     setTrigger((n) => n + 1);
   }, []);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: need to trigger effect
   useEffect(() => {
     let active = true;
     setLoading(true);

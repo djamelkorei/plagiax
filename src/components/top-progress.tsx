@@ -1,8 +1,8 @@
 "use client";
 
 import { Progress } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export const TopProgress = () => {
   const pathname = usePathname();
@@ -10,6 +10,7 @@ export const TopProgress = () => {
   const [progress, setProgress] = useState(0);
   const [visible, setVisible] = useState(false);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: effect must run on route changes
   useEffect(() => {
     // Show bar
     setVisible(true);

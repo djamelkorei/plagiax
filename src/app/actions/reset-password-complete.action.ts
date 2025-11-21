@@ -24,7 +24,7 @@ export async function resetPasswordCompleteAction(
   }
 
   const tokenExpiredIn = 30 * 60 * 1000;
-  const createdAt = new Date(passwordResetToken?.created_at!).getTime();
+  const createdAt = new Date(passwordResetToken.created_at ?? "").getTime();
 
   if (Date.now() - createdAt > tokenExpiredIn) {
     return { hasError: true, message: "Expired token" };

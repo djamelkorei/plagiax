@@ -29,6 +29,6 @@ export async function userDeleteAction(formData: FormData) {
 
     return result > 0;
   } catch (error) {
-    console.log(`Error deleting user with id: ${userId}`);
+    console.log(`Error deleting user with id: ${userId}`, error);
   }
 }

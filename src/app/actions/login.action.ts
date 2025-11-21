@@ -7,6 +7,7 @@ import { LoginFormSchema } from "@/lib/form.service";
 import { prisma } from "@/prisma";
 
 const TOKEN_EXPIRATION = 3;
+const JWT_TOKEN = process.env.JWT_SECRET ?? "";
 
 export async function loginAction(formData: FormData) {
   const body = Object.fromEntries(formData);
@@ -25,7 +26,7 @@ export async function loginAction(formData: FormData) {
   // Create token
   const token = jwt.sign(
     { id: Number(user.id), email: user.email },
-    process.env.JWT_SECRET!,
+    JWT_TOKEN,
     { expiresIn: `${TOKEN_EXPIRATION}h` },
   );
 

@@ -1,8 +1,5 @@
 "use client";
 
-import Link from "next/link";
-
-import { Logo } from "@/components/logo";
 import {
   Avatar,
   Box,
@@ -14,13 +11,15 @@ import {
   Skeleton,
   Text,
 } from "@chakra-ui/react";
-import { MdArrowRightAlt, MdLogin } from "react-icons/md";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Activity } from "react";
-import { useAuth } from "@/hooks/use-auth";
 import { IoLogOutOutline } from "react-icons/io5";
+import { MdArrowRightAlt, MdLogin } from "react-icons/md";
 import { logoutAction } from "@/app/actions/logout.action";
 import { Authorize } from "@/components/authorize";
+import { Logo } from "@/components/logo";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Header = () => {
   const pathname = usePathname();

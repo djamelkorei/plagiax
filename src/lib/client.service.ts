@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { type AxiosError } from "axios";
 import type { SubmissionStatsDto } from "@/dto/submission.dto";
 import type { AuthDto } from "@/dto/user.dto";
 
@@ -23,14 +23,14 @@ const api_auth_me = async (): Promise<ApiResponse<AuthDto>> => {
       hasError: false,
       error: null,
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error in api_auth_me:", error);
     return {
       data: null,
       hasError: true,
       error:
-        error?.response?.data?.message ??
-        error?.message ??
+        (error as AxiosError<{ message: string }>)?.response?.data?.message ??
+        (error as AxiosError)?.message ??
         "Failed to fetch authenticated user",
     };
   }
@@ -47,14 +47,14 @@ const api_submissions_stats = async (): Promise<
       hasError: false,
       error: null,
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error in api_submissions_stats:", error);
     return {
       data: null,
       hasError: true,
       error:
-        error?.response?.data?.message ??
-        error?.message ??
+        (error as AxiosError<{ message: string }>)?.response?.data?.message ??
+        (error as AxiosError)?.message ??
         "Failed to fetch authenticated user",
     };
   }
