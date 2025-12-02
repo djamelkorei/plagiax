@@ -538,10 +538,13 @@ const DownloadLink = ({
         },
       )
       .then((res) => {
+        const filename = res.headers["x-file-name"];
+        const ext = filename.split(".").pop();
+
         const url = URL.createObjectURL(res.data);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `${submissionType}-${submissionId}.pdf`; // or whatever filename
+        a.download = `${submissionType}-${submissionId}.${ext ?? "pdf"}`; // or whatever filename
         a.click();
         URL.revokeObjectURL(url);
       })

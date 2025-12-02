@@ -1,5 +1,8 @@
+import * as fs from "node:fs";
+import path from "node:path";
 import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { type NextRequest, NextResponse } from "next/server";
+import { PDFDocument, rgb } from "pdf-lib";
 import { getServerUser } from "@/lib/auth.service";
 import { prisma } from "@/prisma";
 
@@ -87,21 +90,90 @@ export async function GET(req: NextRequest) {
     "Content-Type",
     s3Response.ContentType || "application/octet-stream",
   );
-  headers.set("Content-Length", String(s3Response.ContentLength) || "");
   headers.set(
     "Content-Disposition",
     `attachment; filename="${encodeURIComponent(filename ?? "")}"`,
   );
+  headers.set("x-file-name", encodeURIComponent(filename ?? ""));
 
   const chunks: Uint8Array[] = [];
   // @ts-expect-error
   for await (const chunk of s3Response.Body) {
     chunks.push(chunk);
   }
-  const fileBuffer = Buffer.concat(chunks);
+  let fileBuffer = Buffer.concat(chunks);
+
+  if (submissionType !== "file") {
+    fileBuffer = await customizePDFHeader(fileBuffer.buffer, submissionType);
+  }
 
   // Stream the S3 file to the browser
   return new NextResponse(fileBuffer, {
     headers,
   });
 }
+
+const customizePDFHeader = async (
+  fileBuffer: ArrayBuffer,
+  submissionType: string | "report" | "ai",
+) => {
+  const pdfDoc = await PDFDocument.load(fileBuffer);
+
+  const pages = pdfDoc.getPages();
+
+  const headerHeight = 51;
+
+  const isAI = submissionType === "ai";
+
+  // 🔹 Load & embed image (logo)
+  const logoPath = path.join(process.cwd(), "public", "logo.png");
+  const logoBytes = fs.readFileSync(logoPath);
+  const logoImage = await pdfDoc.embedPng(logoBytes);
+
+  pdfDoc.removePage(0);
+  if (submissionType === "ai") {
+    pdfDoc.removePage(0);
+  }
+
+  for (const page of pages) {
+    const { width, height } = page.getSize();
+    page.translateContent(0, isAI ? 0 : -headerHeight);
+
+    // Optional: background bar for header
+    page.drawRectangle({
+      x: 0,
+      y: height - (isAI ? headerHeight : 0),
+      width,
+      height: headerHeight,
+      color: rgb(0.95, 0.95, 0.95),
+    });
+
+    if (isAI) {
+      page.drawRectangle({
+        x: 0,
+        y: 0,
+        width,
+        height: headerHeight,
+        color: rgb(1, 1, 1),
+      });
+    }
+
+    // 🔹 Draw logo in the header (scaled)
+    const logoScale = 0.2;
+    const logoDims = logoImage.scale(logoScale);
+
+    const logoX = 15;
+    const logoY =
+      height - (isAI ? headerHeight : 0) + (headerHeight - logoDims.height) / 2; // vertically centered in header
+
+    page.drawImage(logoImage, {
+      x: logoX,
+      y: logoY,
+      width: logoDims.width,
+      height: logoDims.height,
+    });
+  }
+
+  const modifiedBytes = await pdfDoc.save();
+  return Buffer.from(modifiedBytes);
+};
