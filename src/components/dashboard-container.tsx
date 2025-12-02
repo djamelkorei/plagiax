@@ -1,6 +1,14 @@
 "use client";
 
-import { Badge, Box, Button, Flex, Skeleton, Text } from "@chakra-ui/react";
+import {
+  Badge,
+  Box,
+  Button,
+  Flex,
+  Skeleton,
+  Text,
+  useBreakpointValue,
+} from "@chakra-ui/react";
 import { usePathname } from "next/navigation";
 import React, { Activity, type ReactNode } from "react";
 import { HiOutlineHome, HiOutlineMail } from "react-icons/hi";
@@ -49,17 +57,25 @@ export const DashboardContainer = (props: DashboardContainerProps) => {
 };
 
 export const MembershipBar = () => {
+  const isLargeScreen = useBreakpointValue({
+    base: false,
+    sm: false,
+    md: true,
+    lg: true,
+  });
   const auth = useAuth((s) => s.auth);
   const isAuthLoading = useAuth((s) => s.isAuthLoading);
 
   return (
     <Flex
-      gap={6}
+      gap={{ base: 3, md: 6 }}
       borderBottom={"1px solid"}
       borderColor={"border"}
       py={4}
       alignItems={"center"}
-      flexDirection={{ base: "column", md: "row" }}
+      justifyContent={{ base: "center", md: "left" }}
+      flexWrap={"wrap"}
+      //  flexDirection={{ base: "column", md: "row" }}
     >
       <Flex gap={2} alignItems={"center"}>
         <Text textStyle={"sm"} fontWeight={"semibold"}>
@@ -113,13 +129,19 @@ export const MembershipBar = () => {
         </>
       )}
 
-      <Flex alignItems={"center"} gap={2} ms={{ base: "inherit", md: "auto" }}>
-        Need help ?
-        <Button size={"xs"} ms={"auto"}>
-          Contact Us
-          <HiOutlineMail />
-        </Button>
-      </Flex>
+      {isLargeScreen && (
+        <Flex
+          alignItems={"center"}
+          gap={2}
+          ms={{ base: "inherit", md: "auto" }}
+        >
+          <Text display={{ base: "none", xl: "block" }}>Need help ?</Text>
+          <Button size={"xs"} ms={"auto"}>
+            Contact Us
+            <HiOutlineMail />
+          </Button>
+        </Flex>
+      )}
     </Flex>
   );
 };

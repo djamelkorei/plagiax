@@ -7,7 +7,6 @@ import {
   Field,
   Fieldset,
   Flex,
-  HStack,
   Input,
   Stack,
 } from "@chakra-ui/react";
@@ -130,11 +129,16 @@ export default function Login() {
                   </Field.Root>
                 </Fieldset.Content>
 
-                <HStack justifyContent={"space-between"}>
+                <Flex
+                  flexDirection={{ base: "column", md: "row" }}
+                  justifyContent={"space-between"}
+                  gap={4}
+                >
                   <Button
                     type="submit"
                     alignSelf="flex-start"
                     loading={loading}
+                    w={{ base: "full", md: "inherit" }}
                   >
                     Sign in
                     <MdArrowRightAlt />
@@ -142,7 +146,7 @@ export default function Login() {
                   <ChakraLink variant={"underline"} asChild>
                     <Link href={"/forget-password"}>Forgot your password?</Link>
                   </ChakraLink>
-                </HStack>
+                </Flex>
               </Fieldset.Root>
             </form>
           </Box>

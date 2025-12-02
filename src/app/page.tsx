@@ -279,7 +279,7 @@ export default function Home() {
 
       {/* Call to Action */}
       <Flex
-        flexDirection={"row"}
+        flexDirection={{ base: "column-reverse", md: "row" }}
         alignItems={"center"}
         justifyContent={"space-between"}
         gap={6}
@@ -295,7 +295,7 @@ export default function Home() {
             Start using {AppContext.name} today and ensure your content is
             always original.
           </Text>
-          <Button w={"fit-content"} asChild>
+          <Button w={{ base: "full", md: "fit-content" }} asChild>
             <Link href={"/login"}>
               Get Started
               <MdArrowRightAlt />
