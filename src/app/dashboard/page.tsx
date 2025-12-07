@@ -11,6 +11,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { HiOutlineUsers } from "react-icons/hi";
+import { IoLayersOutline } from "react-icons/io5";
 import { LuBadgeCheck } from "react-icons/lu";
 import { PiNewspaper } from "react-icons/pi";
 import {
@@ -111,7 +112,7 @@ export default function DashboardHome() {
                   <Stat.Label>
                     Total day submission
                     <Icon asChild w={5} h={5} ms={"auto"}>
-                      <HiOutlineUsers />
+                      <IoLayersOutline />
                     </Icon>
                   </Stat.Label>
                   <Skeleton loading={isAuthLoading} w={"fit-content"}>
