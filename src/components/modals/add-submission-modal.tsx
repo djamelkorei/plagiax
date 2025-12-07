@@ -21,7 +21,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { Dispatch, SetStateAction } from "react";
+import { type Dispatch, type SetStateAction, useState } from "react";
 import {
   FormProvider,
   useForm,
@@ -74,6 +74,7 @@ export const AddSubmissionModal = ({
   setOpen,
   callback,
 }: AddSubmissionModalProps) => {
+  const [submitting, setSubmitting] = useState<boolean>(false);
   const formMethods = useForm<AddSubmissionFormRequest>({
     resolver: zodResolver(AddSubmissionFormSchema),
     defaultValues: {
@@ -100,6 +101,7 @@ export const AddSubmissionModal = ({
   });
 
   const onSubmit = (data: AddSubmissionFormRequest) => {
+    setSubmitting(true);
     const formData = new FormData();
     formData.append("file", data.file);
     formData.append("title", data.title ?? "");
@@ -114,17 +116,21 @@ export const AddSubmissionModal = ({
       String(data.exclusion_bibliographic),
     );
     formData.append("exclusion_quoted", String(data.exclusion_quoted));
-    submissionAddAction(formData).then((res) => {
-      if (res.hasError) {
-        formMethods.setError("file", {
-          type: "server",
-          message: res.message,
-        });
-      } else {
-        setOpen(false);
-        callback();
-      }
-    });
+    submissionAddAction(formData)
+      .then((res) => {
+        if (res.hasError) {
+          formMethods.setError("file", {
+            type: "server",
+            message: res.message,
+          });
+        } else {
+          setOpen(false);
+          callback();
+        }
+      })
+      .finally(() => {
+        setSubmitting(false);
+      });
   };
 
   return (
@@ -388,17 +394,11 @@ export const AddSubmissionModal = ({
                 </Dialog.Body>
                 <Dialog.Footer>
                   <Dialog.ActionTrigger asChild>
-                    <Button
-                      disabled={formMethods.formState.isSubmitting}
-                      variant="outline"
-                    >
+                    <Button disabled={submitting} variant="outline">
                       Cancel
                     </Button>
                   </Dialog.ActionTrigger>
-                  <Button
-                    loading={formMethods.formState.isSubmitting}
-                    type={"submit"}
-                  >
+                  <Button loading={submitting} type={"submit"}>
                     Submit <MdArrowRightAlt />
                   </Button>
                 </Dialog.Footer>
