@@ -11,12 +11,12 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { HiOutlineUsers } from "react-icons/hi";
+import { HiOutlineDocumentMagnifyingGlass } from "react-icons/hi2";
 import { IoLayersOutline } from "react-icons/io5";
 import { LuBadgeCheck } from "react-icons/lu";
-import { PiNewspaper } from "react-icons/pi";
 import {
-  Area,
-  AreaChart,
+  Bar,
+  BarChart,
   CartesianGrid,
   Cell,
   Label,
@@ -142,7 +142,7 @@ export default function DashboardHome() {
                 <Stat.Label>
                   Submissions
                   <Icon asChild w={5} h={5} ms={"auto"}>
-                    <PiNewspaper />
+                    <HiOutlineDocumentMagnifyingGlass />
                   </Icon>
                 </Stat.Label>
                 <Skeleton loading={isAuthLoading} w={"fit-content"}>
@@ -302,7 +302,7 @@ const SubmissionChart = () => {
   return (
     <Skeleton loading={loading}>
       <Chart.Root maxH="2xs" chart={chart}>
-        <AreaChart data={chart.data}>
+        <BarChart data={chart.data}>
           <CartesianGrid
             stroke={chart.color("border")}
             vertical={false}
@@ -361,18 +361,28 @@ const SubmissionChart = () => {
           {/*))}*/}
 
           {chart.series.map((item) => (
-            <Area
+            <Bar
               key={item.name}
-              type="natural"
               isAnimationActive={false}
               dataKey={chart.key(item.name)}
               fill={`url(#${item.name}-gradient)`}
-              stroke={chart.color(item.color)}
-              strokeWidth={1}
               stackId="a"
             />
           ))}
-        </AreaChart>
+
+          {/*{chart.series.map((item) => (*/}
+          {/*  <Area*/}
+          {/*    key={item.name}*/}
+          {/*    type="natural"*/}
+          {/*    isAnimationActive={false}*/}
+          {/*    dataKey={chart.key(item.name)}*/}
+          {/*    fill={`url(#${item.name}-gradient)`}*/}
+          {/*    stroke={chart.color(item.color)}*/}
+          {/*    strokeWidth={1}*/}
+          {/*    stackId="a"*/}
+          {/*  />*/}
+          {/*))}*/}
+        </BarChart>
       </Chart.Root>
     </Skeleton>
   );
