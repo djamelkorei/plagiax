@@ -4,7 +4,7 @@ module.exports = {
       name: "plagiax",
       script: "npm",
       args: "start",
-      instances: 2,
+      instances: 1,
       exec_mode: "cluster",
       max_memory_restart: "1G",
       restart_delay: 5000,
