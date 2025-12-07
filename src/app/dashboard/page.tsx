@@ -76,29 +76,64 @@ export default function DashboardHome() {
             </Card.Body>
           </Card.Root>
 
-          <Card.Root>
-            <Card.Body bg={"secondaryLight"}>
-              <Stat.Root>
-                <Stat.Label>
-                  Total student accounts
-                  <Icon asChild w={5} h={5} ms={"auto"}>
-                    <HiOutlineUsers />
-                  </Icon>
-                </Stat.Label>
-                <Skeleton loading={isAuthLoading} w={"fit-content"}>
-                  <Stat.ValueText alignItems="baseline">
-                    12{" "}
-                    <Stat.ValueUnit>/ {(2000).toLocaleString()}</Stat.ValueUnit>
-                  </Stat.ValueText>
-                </Skeleton>
-                <Skeleton loading={isAuthLoading} w={"fit-content"}>
-                  <Stat.HelpText>
-                    Total account left <b>{(2000 - 12).toLocaleString()}</b>
-                  </Stat.HelpText>
-                </Skeleton>
-              </Stat.Root>
-            </Card.Body>
-          </Card.Root>
+          {auth.is_instructor && (
+            <Card.Root>
+              <Card.Body bg={"secondaryLight"}>
+                <Stat.Root>
+                  <Stat.Label>
+                    Total student accounts
+                    <Icon asChild w={5} h={5} ms={"auto"}>
+                      <HiOutlineUsers />
+                    </Icon>
+                  </Stat.Label>
+                  <Skeleton loading={isAuthLoading} w={"fit-content"}>
+                    <Stat.ValueText alignItems="baseline">
+                      12{" "}
+                      <Stat.ValueUnit>
+                        / {(2000).toLocaleString()}
+                      </Stat.ValueUnit>
+                    </Stat.ValueText>
+                  </Skeleton>
+                  <Skeleton loading={isAuthLoading} w={"fit-content"}>
+                    <Stat.HelpText>
+                      Total account left <b>{(2000 - 12).toLocaleString()}</b>
+                    </Stat.HelpText>
+                  </Skeleton>
+                </Stat.Root>
+              </Card.Body>
+            </Card.Root>
+          )}
+
+          {!auth.is_instructor && (
+            <Card.Root>
+              <Card.Body bg={"secondaryLight"}>
+                <Stat.Root>
+                  <Stat.Label>
+                    Total day submission
+                    <Icon asChild w={5} h={5} ms={"auto"}>
+                      <HiOutlineUsers />
+                    </Icon>
+                  </Stat.Label>
+                  <Skeleton loading={isAuthLoading} w={"fit-content"}>
+                    <Stat.ValueText alignItems="baseline">
+                      {auth.submission_day_count}{" "}
+                      <Stat.ValueUnit>/ {auth.daily_quota}</Stat.ValueUnit>
+                    </Stat.ValueText>
+                  </Skeleton>
+                  <Skeleton loading={isAuthLoading} w={"fit-content"}>
+                    <Stat.HelpText>
+                      Submission left for today{" "}
+                      <b>
+                        {(
+                          auth.daily_quota - auth.submission_day_count
+                        ).toLocaleString()}
+                      </b>
+                    </Stat.HelpText>
+                  </Skeleton>
+                </Stat.Root>
+              </Card.Body>
+            </Card.Root>
+          )}
 
           <Card.Root>
             <Card.Body bg={"secondaryLight"}>

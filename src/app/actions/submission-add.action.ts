@@ -49,6 +49,14 @@ export async function submissionAddAction(
           "The maximum number of pending submissions is 1. Please wait until the pending submissions are processed.",
       };
     }
+  } else {
+    if (authUser.submission_day_count + 1 > authUser.daily_quota) {
+      return {
+        hasError: true,
+        message:
+          "You consume all your daily quota for today, come back tomorrow or upgrade your plan.",
+      };
+    }
   }
 
   const body = Object.fromEntries(formData);

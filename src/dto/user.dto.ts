@@ -13,6 +13,8 @@ export interface AuthDto {
   membership_days_left: number;
   is_membership_active: boolean;
   is_instructor: boolean;
+  daily_quota: number;
+  submission_day_count: number;
 }
 
 export interface UserDTO {

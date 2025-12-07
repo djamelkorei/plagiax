@@ -103,6 +103,25 @@ export const MembershipBar = () => {
         </Skeleton>
       </Flex>
 
+      <Text color={"gray.300"} display={{ base: "none", md: "block" }}>
+        |
+      </Text>
+
+      <Flex gap={2} alignItems={"center"}>
+        <Text textStyle={"sm"} fontWeight={"semibold"}>
+          Daily quota
+        </Text>
+        <Skeleton loading={isAuthLoading}>
+          <Badge
+            colorPalette={
+              auth.daily_quota > auth.submission_day_count ? "teal" : "red"
+            }
+          >
+            {auth.submission_day_count}/{auth.daily_quota}
+          </Badge>
+        </Skeleton>
+      </Flex>
+
       {auth.is_instructor && (
         <>
           <Text color={"gray.300"} display={{ base: "none", md: "block" }}>
