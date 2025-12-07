@@ -38,18 +38,25 @@ export async function getServerUser(): Promise<AuthDto | null> {
            coalesce(u.membership_student_count, ins.membership_student_count) as membership_student_count,
            coalesce(u.membership_started_at, ins.membership_started_at)       as membership_started_at,
            coalesce(u.membership_ended_at, ins.membership_ended_at)           as membership_ended_at,
-           coalesce(u.membership_ended_at, ins.membership_ended_at) >=
+           date(coalesce(u.membership_ended_at, ins.membership_ended_at)) >=
            curdate()                                                          as is_membership_active,
-           if(coalesce(u.membership_started_at, ins.membership_started_at) <= curdate()
-                and coalesce(u.membership_ended_at, ins.membership_ended_at) >= curdate(),
-              greatest(ceil(datediff(coalesce(u.membership_ended_at, ins.membership_ended_at), curdate())), 0),
-              0)                                                              as membership_days_left,
+           IF(date(COALESCE(u.membership_started_at, ins.membership_started_at)) <= CURDATE()
+                AND date(COALESCE(u.membership_ended_at, ins.membership_ended_at)) >= CURDATE(),
+              GREATEST(
+                DATEDIFF(
+                  date(COALESCE(u.membership_ended_at, ins.membership_ended_at)),
+                  CURDATE()
+                ),
+                0
+              ),
+              0
+           ) AS membership_days_left,
            (select count(*)
             from submissions s
             where exists(select 1
-                         from users u2
-                         where s.user_id = u2.instructor_id
-                            or s.user_id = u2.id))                            as submission_count,
+                         from users u3
+                         where u3.id = u.id and (s.user_id = u3.instructor_id
+                           or s.user_id = u3.id)))                            as submission_count,
            (select count(*)
             from users u2
             where u2.instructor_id = u.id
