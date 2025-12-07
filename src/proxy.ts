@@ -4,7 +4,7 @@ import { getServerUser, verifyToken } from "@/lib/auth.service";
 
 const dashboardRoute = "/dashboard";
 
-const instructorRoutes = ["/dashboard", "/dashboard/students"];
+const instructorRoutes = ["/dashboard/students"];
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;

@@ -143,9 +143,7 @@ const NavLinks = ({ isDrawer }: { isDrawer: boolean }) => {
             alignItems={"center"}
             flexDirection={isDrawer ? "column" : "row"}
           >
-            <Authorize roles={["instructor"]}>
-              <NavLink text={"Dashboard"} href={"/dashboard"} />
-            </Authorize>
+            <NavLink text={"Dashboard"} href={"/dashboard"} />
             <NavLink text={"Submissions"} href={"/dashboard/submissions"} />
             <Authorize roles={["instructor"]}>
               <NavLink text={"Students"} href={"/dashboard/students"} />

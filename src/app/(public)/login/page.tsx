@@ -52,7 +52,7 @@ export default function Login() {
           if (role === "instructor") {
             router.push("/dashboard");
           } else {
-            router.push("/dashboard/submissions");
+            router.push("/dashboard");
           }
         });
       } else {
