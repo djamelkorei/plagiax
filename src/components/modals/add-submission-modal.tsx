@@ -319,37 +319,39 @@ export const AddSubmissionModal = ({
                           bg={"gray.50"}
                           _hover={{ bg: "orange.50" }}
                         >
-                          <Icon size="xl" color="fg.muted">
-                            <IoCloudUploadOutline />
-                          </Icon>
                           <FileUpload.DropzoneContent>
-                            <Box fontSize={"sm"} mb={5}>
-                              Drag and drop file here
-                            </Box>
-                            <Flex
-                              fontSize={"xs"}
-                              flexDirection={"column"}
-                              color="fg.muted"
-                            >
-                              <Text as={"span"}>
-                                Uploaded file must be less than <b>100 MB</b>
-                              </Text>
-                              <Text as={"span"}>
-                                Uploaded file must has less than{" "}
-                                <b>800 pages</b>
-                              </Text>
-                              <Text as={"span"}>
-                                Files must contain <b>over 20 words</b> for a
-                                similarity report
-                              </Text>
-                              <Text as={"span"}>
-                                Supported file types for generating repots:
-                              </Text>
-                              <Text as={"span"} fontWeight={"bold"}>
-                                .docx, .xlsx, .pptx, .ps, .pdf, .html, .rtf,
-                                .odt, .hwp, .txt
-                              </Text>
-                            </Flex>
+                            <FileUpload.Trigger cursor={"pointer"}>
+                              <Icon size="xl" color="fg.muted">
+                                <IoCloudUploadOutline />
+                              </Icon>
+                              <Box fontSize={"sm"} mb={5}>
+                                Drag and drop file here
+                              </Box>
+                              <Flex
+                                fontSize={"xs"}
+                                flexDirection={"column"}
+                                color="fg.muted"
+                              >
+                                <Text as={"span"}>
+                                  Uploaded file must be less than <b>100 MB</b>
+                                </Text>
+                                <Text as={"span"}>
+                                  Uploaded file must has less than{" "}
+                                  <b>800 pages</b>
+                                </Text>
+                                <Text as={"span"}>
+                                  Files must contain <b>over 20 words</b> for a
+                                  similarity report
+                                </Text>
+                                <Text as={"span"}>
+                                  Supported file types for generating repots:
+                                </Text>
+                                <Text as={"span"} fontWeight={"bold"}>
+                                  .docx, .xlsx, .pptx, .ps, .pdf, .html, .rtf,
+                                  .odt, .hwp, .txt
+                                </Text>
+                              </Flex>
+                            </FileUpload.Trigger>
                           </FileUpload.DropzoneContent>
                         </FileUpload.Dropzone>
                         <FileUpload.List clearable />
