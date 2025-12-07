@@ -27,6 +27,8 @@ const anonymous: AuthDto = {
   is_membership_active: false,
   is_instructor: false,
   ai_enabled: false,
+  daily_quota: 0,
+  submission_day_count: 0,
 };
 
 export const useAuth = create<AuthState>((set) => ({
