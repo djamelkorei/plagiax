@@ -137,41 +137,49 @@ const customizePDFHeader = async (
 
   for (const page of pages) {
     const { width, height } = page.getSize();
-    page.translateContent(0, isAI ? 0 : -headerHeight);
-
-    // Optional: background bar for header
-    page.drawRectangle({
-      x: 0,
-      y: height - (isAI ? headerHeight : 0),
-      width,
-      height: headerHeight,
-      color: rgb(0.95, 0.95, 0.95),
-    });
-
     if (isAI) {
+      const customHeader = 48;
+      page.setCropBox(0, customHeader, width, height - 2 * customHeader);
+      page.setMediaBox(0, customHeader, width, height - 2 * customHeader);
+    } else {
+      page.translateContent(0, isAI ? 0 : -headerHeight);
+
+      // Optional: background bar for header
       page.drawRectangle({
         x: 0,
-        y: 0,
+        y: height - (isAI ? headerHeight : 0),
         width,
         height: headerHeight,
-        color: rgb(1, 1, 1),
+        color: rgb(0.95, 0.95, 0.95),
+      });
+
+      if (isAI) {
+        page.drawRectangle({
+          x: 0,
+          y: 0,
+          width,
+          height: headerHeight,
+          color: rgb(1, 1, 1),
+        });
+      }
+
+      // 🔹 Draw logo in the header (scaled)
+      const logoScale = 0.2;
+      const logoDims = logoImage.scale(logoScale);
+
+      const logoX = 15;
+      const logoY =
+        height -
+        (isAI ? headerHeight : 0) +
+        (headerHeight - logoDims.height) / 2; // vertically centered in header
+
+      page.drawImage(logoImage, {
+        x: logoX,
+        y: logoY,
+        width: logoDims.width,
+        height: logoDims.height,
       });
     }
-
-    // 🔹 Draw logo in the header (scaled)
-    const logoScale = 0.2;
-    const logoDims = logoImage.scale(logoScale);
-
-    const logoX = 15;
-    const logoY =
-      height - (isAI ? headerHeight : 0) + (headerHeight - logoDims.height) / 2; // vertically centered in header
-
-    page.drawImage(logoImage, {
-      x: logoX,
-      y: logoY,
-      width: logoDims.width,
-      height: logoDims.height,
-    });
   }
 
   const modifiedBytes = await pdfDoc.save();
