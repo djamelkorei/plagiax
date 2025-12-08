@@ -126,7 +126,11 @@ const customizePDFHeader = async (
   const isAI = submissionType === "ai";
 
   // 🔹 Load & embed image (logo)
-  const logoPath = path.join(process.cwd(), "public", "logo.png");
+  const logoPath = path.join(
+    process.cwd(),
+    "public",
+    "external-logo-provider.png",
+  );
   const logoBytes = fs.readFileSync(logoPath);
   const logoImage = await pdfDoc.embedPng(logoBytes);
 
@@ -164,7 +168,7 @@ const customizePDFHeader = async (
       }
 
       // 🔹 Draw logo in the header (scaled)
-      const logoScale = 0.2;
+      const logoScale = 0.35;
       const logoDims = logoImage.scale(logoScale);
 
       const logoX = 15;
