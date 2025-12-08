@@ -131,14 +131,14 @@ const customizePDFHeader = async (
   const logoImage = await pdfDoc.embedPng(logoBytes);
 
   pdfDoc.removePage(0);
-  if (submissionType === "ai") {
-    pdfDoc.removePage(0);
-  }
+  // if (submissionType === "ai") {
+  //   pdfDoc.removePage(0);
+  // }
 
   for (const page of pages) {
     const { width, height } = page.getSize();
     if (isAI) {
-      const customHeader = 48;
+      const customHeader = 52;
       page.setCropBox(0, customHeader, width, height - 2 * customHeader);
       page.setMediaBox(0, customHeader, width, height - 2 * customHeader);
     } else {
