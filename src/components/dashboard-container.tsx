@@ -1,17 +1,9 @@
 "use client";
 
-import {
-  Badge,
-  Box,
-  Button,
-  Flex,
-  Skeleton,
-  Text,
-  useBreakpointValue,
-} from "@chakra-ui/react";
+import { Badge, Box, Flex, Skeleton, Text } from "@chakra-ui/react";
 import { usePathname } from "next/navigation";
 import React, { Activity, type ReactNode } from "react";
-import { HiOutlineHome, HiOutlineMail } from "react-icons/hi";
+import { HiOutlineHome } from "react-icons/hi";
 import { useAuth } from "@/hooks/use-auth";
 
 interface DashboardContainerProps {
@@ -57,12 +49,12 @@ export const DashboardContainer = (props: DashboardContainerProps) => {
 };
 
 export const MembershipBar = () => {
-  const isLargeScreen = useBreakpointValue({
-    base: false,
-    sm: false,
-    md: true,
-    lg: true,
-  });
+  // const isLargeScreen = useBreakpointValue({
+  //   base: false,
+  //   sm: false,
+  //   md: true,
+  //   lg: true,
+  // });
   const auth = useAuth((s) => s.auth);
   const isAuthLoading = useAuth((s) => s.isAuthLoading);
 
@@ -148,19 +140,19 @@ export const MembershipBar = () => {
         </>
       )}
 
-      {isLargeScreen && (
-        <Flex
-          alignItems={"center"}
-          gap={2}
-          ms={{ base: "inherit", md: "auto" }}
-        >
-          <Text display={{ base: "none", xl: "block" }}>Need help ?</Text>
-          <Button size={"xs"} ms={"auto"}>
-            Contact Us
-            <HiOutlineMail />
-          </Button>
-        </Flex>
-      )}
+      {/*{isLargeScreen && (*/}
+      {/*  <Flex*/}
+      {/*    alignItems={"center"}*/}
+      {/*    gap={2}*/}
+      {/*    ms={{ base: "inherit", md: "auto" }}*/}
+      {/*  >*/}
+      {/*    <Text display={{ base: "none", xl: "block" }}>Need help ?</Text>*/}
+      {/*    <Button size={"xs"} ms={"auto"}>*/}
+      {/*      Contact Us*/}
+      {/*      <HiOutlineMail />*/}
+      {/*    </Button>*/}
+      {/*  </Flex>*/}
+      {/*)}*/}
     </Flex>
   );
 };

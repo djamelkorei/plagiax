@@ -92,16 +92,16 @@ export default function Login() {
                   <Fieldset.HelperText>
                     Enter your email and password to access your account.
                   </Fieldset.HelperText>
-                  <Fieldset.HelperText>
-                    If you don't have an account, you can Please contact us{" "}
-                    <ChakraLink
-                      variant="underline"
-                      textDecoration={"underline"}
-                    >
-                      here
-                    </ChakraLink>
-                    .
-                  </Fieldset.HelperText>
+                  {/*<Fieldset.HelperText>*/}
+                  {/*  If you don't have an account, you can Please contact us{" "}*/}
+                  {/*  <ChakraLink*/}
+                  {/*    variant="underline"*/}
+                  {/*    textDecoration={"underline"}*/}
+                  {/*  >*/}
+                  {/*    here*/}
+                  {/*  </ChakraLink>*/}
+                  {/*  .*/}
+                  {/*</Fieldset.HelperText>*/}
                 </Stack>
 
                 <Fieldset.Content>

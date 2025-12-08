@@ -71,11 +71,12 @@ export default function Terms() {
           We retain your personal data for as long as necessary to fulfill the
           purposes outlined in this Privacy Policy or as required by law. If you
           wish to delete your account or request removal of your data, please
-          contact us at{" "}
-          <Text as={"b"} textTransform={"lowercase"}>
-            [{AppContext.email}]
-          </Text>
-          .
+          *contact us.
+          {/*at{" "}*!/*/}
+          {/*<Text as={"b"} textTransform={"lowercase"}>*/}
+          {/*  [{AppContext.email}]*/}
+          {/*</Text>*/}
+          {/*.*/}
         </Text>
 
         <Heading as="h3" size="lg" mb={4}>
@@ -125,11 +126,12 @@ export default function Terms() {
           <List.Item>The right to withdraw consent at any time.</List.Item>
         </List.Root>
         <Text mb={6}>
-          To exercise any of these rights, please contact us at{" "}
-          <Text as={"b"} textTransform={"lowercase"}>
-            [{AppContext.email}]
-          </Text>
-          .
+          To exercise any of these rights, please contact us.
+          {/*at{" "}*/}
+          {/*<Text as={"b"} textTransform={"lowercase"}>*/}
+          {/*  [{AppContext.email}]*/}
+          {/*</Text>*/}
+          {/*.*/}
         </Text>
 
         <Heading as="h3" size="lg" mb={4}>
@@ -156,11 +158,12 @@ export default function Terms() {
         </Heading>
         <Text mb={6}>
           If you have any questions or concerns about our privacy practices,
-          please reach out to us at{" "}
-          <Text as={"b"} textTransform={"lowercase"}>
-            [{AppContext.email}]
-          </Text>
-          .
+          please reach out to us.
+          {/*at{" "}*/}
+          {/*<Text as={"b"} textTransform={"lowercase"}>*/}
+          {/*  [{AppContext.email}]*/}
+          {/*</Text>*/}
+          {/*.*/}
         </Text>
       </Box>
     </Box>

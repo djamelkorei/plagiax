@@ -18,9 +18,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Activity, useEffect, useState } from "react";
 import { CiMenuBurger } from "react-icons/ci";
-import { HiOutlineMail } from "react-icons/hi";
 import { IoLogOutOutline } from "react-icons/io5";
-import { MdArrowRightAlt, MdLogin } from "react-icons/md";
+import { MdLogin } from "react-icons/md";
 import { logoutAction } from "@/app/actions/logout.action";
 import { Authorize } from "@/components/authorize";
 import { Logo } from "@/components/logo";
@@ -86,10 +85,10 @@ export const Header = () => {
                     </Flex>
                     <NavLinks isDrawer={true} />
 
-                    <Button w={"fit-content"} size={"md"}>
-                      Contact Us
-                      <HiOutlineMail />
-                    </Button>
+                    {/*<Button w={"fit-content"} size={"md"}>*/}
+                    {/*  Contact Us*/}
+                    {/*  <HiOutlineMail />*/}
+                    {/*</Button>*/}
                   </Dialog.Body>
                   <Dialog.CloseTrigger asChild>
                     <CloseButton
@@ -163,14 +162,14 @@ const NavLinks = ({ isDrawer }: { isDrawer: boolean }) => {
             </Button>
           </Show>
 
-          <Show when={isLoginPage}>
-            <Button asChild>
-              <Link href={"/login"}>
-                Contact us
-                <MdArrowRightAlt />
-              </Link>
-            </Button>
-          </Show>
+          {/*<Show when={isLoginPage}>*/}
+          {/*  <Button asChild>*/}
+          {/*    <Link href={"/login"}>*/}
+          {/*      Contact us*/}
+          {/*      <MdArrowRightAlt />*/}
+          {/*    </Link>*/}
+          {/*  </Button>*/}
+          {/*</Show>*/}
         </Skeleton>
       </Activity>
 

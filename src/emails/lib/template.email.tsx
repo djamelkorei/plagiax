@@ -67,15 +67,15 @@ export default function TemplateEmail({
               .
             </Text>
 
-            <Text className="text-[#777] text-[14px] leading-[1.5] m-0!">
-              If you require any assistance, don’t hesitate to reach out at :{" "}
-              <a
-                className={"text-[#555] text-underline"}
-                href={`mailto:${AppContext.email}`}
-              >
-                {AppContext.email}
-              </a>
-            </Text>
+            {/*<Text className="text-[#777] text-[14px] leading-[1.5] m-0!">*/}
+            {/*  If you require any assistance, don’t hesitate to reach out at :{" "}*/}
+            {/*  <a*/}
+            {/*    className={"text-[#555] text-underline"}*/}
+            {/*    href={`mailto:${AppContext.email}`}*/}
+            {/*  >*/}
+            {/*    {AppContext.email}*/}
+            {/*  </a>*/}
+            {/*</Text>*/}
           </Container>
 
           <Container className="px-10 py-5 text-center">
