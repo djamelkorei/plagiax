@@ -39,7 +39,7 @@ export async function accountInfoUpdate(
     await prisma.users.update({
       data: {
         name: parsed.data.name,
-        email: parsed.data.email,
+        // email: parsed.data.email,
         updated_at: now,
       },
       where: {

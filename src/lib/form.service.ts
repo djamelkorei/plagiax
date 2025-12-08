@@ -46,6 +46,7 @@ export type AccountInfoFormRequest = z.infer<typeof AccountInfoFormSchema>;
 
 export const AccountPasswordFormSchema = z
   .object({
+    email_otp: z.string().min(1, "The email otp is required"),
     current_password: z.string().min(1, "The current password is required"),
     new_password: z.string().min(1, "The new password is required"),
     confirm_password: z.string().min(1, "The confirm password is required"),
