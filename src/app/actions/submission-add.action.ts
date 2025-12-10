@@ -95,6 +95,7 @@ export async function submissionAddAction(
         status: "PENDING",
         user_id: authUser.id,
         posted_at: new Date(),
+        is_quick_submission: true,
         exclusion_bibliographic: parsed.data.exclusion_bibliographic,
         exclusion_quoted: parsed.data.exclusion_quoted,
         exclusion_small_sources: parsed.data.exclusion_small_sources,
